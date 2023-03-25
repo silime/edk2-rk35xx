@@ -200,7 +200,7 @@ DwHdmiQpConnectorPreInit (
     ConnectorState->OutputInterface = VOP_OUTPUT_IF_HDMI0;
 
   DwHdmiQpSetIomux(Hdmi);
-
+  EnablePWM(TRUE);
   HdptxRopllCmnConfig(&Hdptx);
   DEBUG ((DEBUG_INFO, "%a hdmi pre init success\n", __func__));
   return 0;

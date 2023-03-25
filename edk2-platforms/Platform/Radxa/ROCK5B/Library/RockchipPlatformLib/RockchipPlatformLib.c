@@ -9,6 +9,7 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
+#include <Library/PWMLib.h>
 #include <Soc.h>
 
 void DebugPrintHex(void *buf, UINT32 width, UINT32 len)
@@ -172,6 +173,14 @@ I2cGetBase (
   case 5:
     Base = 0xFEAD0000;
     break;
+  case 6:
+    Base = 0xFEC80000;
+     /* io mux */
+    BUS_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009; //gpio0d0
+    BUS_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000; //gpio0c7
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
+    PMU2_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
+    break;
   default:
     break;
   }
@@ -194,9 +203,9 @@ UsbPortPowerEnable (void)
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
-  // GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
-  // GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
+  DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
+  GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
+  GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
 }
 
 void
@@ -277,3 +286,23 @@ Pcie30PeReset(BOOLEAN enable)
     GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
 }
 
+void
+EFIAPI
+EnablePWM(IN BOOLEAN en) {
+  DEBUG((EFI_D_WARN, "\n Trying to enable fan \n"));
+
+  PWM_DATA PwmData = {
+    .ControllerID = PWM_CONTROLLER0,
+    .ChannelID = PWM_CHANNEL1,
+    .PeriodNs = 1000,
+    .DutyNs = 500,
+    .Polarity = 0
+  };
+
+  if (en) {
+    MmioWrite32(0xFD5F4004, 0x000f0003);//PWM1M0 IOMUX
+    RkPwmSetConfig(&PwmData);
+    RkPwmEnable(&PwmData);
+  } else
+    RkPwmDisable(&PwmData);
+}
