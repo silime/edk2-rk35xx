@@ -139,13 +139,13 @@
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x2 }
-  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x2 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x6 }
+  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x6 }
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency|198000000
   gRockchipTokenSpaceGuid.PcdI2cBaudRate|100000
   gRockchipTokenSpaceGuid.PcdI2cBusCount|1
-  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x51 } #/* RTCYM8563TS 0x51@bus2 */
-  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x2 }
+  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x51 } #/* RTCYM8563TS 0x51@bus6 */
+  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x6 }
 
   ## UART2 - Serial Terminal
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
