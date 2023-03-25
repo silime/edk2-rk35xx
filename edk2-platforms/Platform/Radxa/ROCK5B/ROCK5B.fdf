@@ -281,7 +281,7 @@ READ_LOCK_STATUS   = TRUE
   INF Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   
   # Needs to be disabled if booting from eMMC
-  # INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
   # AHCI Support
