@@ -359,20 +359,20 @@ PlatformPcieWiFiEnable (
   )
 {
   // WiFi - enable
-  GpioPinWrite (0, GPIO_PIN_PC4, Enable); // WIFI_REG_ON_H
+  GpioPinWrite (0, GPIO_PIN_PC4, Enable); // pin 23  WIFI_REG_ON_H
   GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
-  GpioPinWrite (0, GPIO_PIN_PC5, Enable); // BT_WAKE_HOST_H
-  GpioPinSetDirection (0, GPIO_PIN_PC5, GPIO_PIN_OUTPUT); 
-  GpioPinWrite (0, GPIO_PIN_PB2, Enable); // WIFI_WAKE_HOST_H
-  GpioPinSetDirection (0, GPIO_PIN_PB2, GPIO_PIN_OUTPUT); 
-  // GpioPinWrite (4, GPIO_PIN_PA2, Enable); // W-DISABLE
+  // GpioPinWrite (0, GPIO_PIN_PC5, Enable); // pin 20 BT_WAKE_HOST_H
+  // GpioPinSetDirection (0, GPIO_PIN_PC5, GPIO_PIN_OUTPUT); 
+  // GpioPinWrite (0, GPIO_PIN_PB2, Enable); // pin 21  WIFI_WAKE_HOST_H
+  // GpioPinSetDirection (0, GPIO_PIN_PB2, GPIO_PIN_OUTPUT); 
+  // GpioPinWrite (4, GPIO_PIN_PA2, Enable); // pin 56 W-DISABLE
   // GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 
   // // bluetooth - enable
-  // GpioPinWrite (3, GPIO_PIN_PD5, Enable); // BT_WAKE_L
+  // GpioPinWrite (3, GPIO_PIN_PD5, Enable); // pin 54 BT_WAKE_L
   // GpioPinSetDirection (3, GPIO_PIN_PD5, GPIO_PIN_OUTPUT);
-  // GpioPinWrite (3, GPIO_PIN_PA6, Enable); // BT_REG_ON_H 
-  // GpioPinSetDirection (3, GPIO_PIN_PA6, GPIO_PIN_OUTPUT);
+  GpioPinWrite (3, GPIO_PIN_PA6, Enable); // pin 42 BT_REG_ON_H 
+  GpioPinSetDirection (3, GPIO_PIN_PA6, GPIO_PIN_OUTPUT);
 
 }
 
