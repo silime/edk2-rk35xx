@@ -365,8 +365,8 @@ PlatformPcieWiFiEnable (
   // GpioPinSetDirection (0, GPIO_PIN_PC5, GPIO_PIN_OUTPUT); 
   // GpioPinWrite (0, GPIO_PIN_PB2, Enable); // pin 21  WIFI_WAKE_HOST_H
   // GpioPinSetDirection (0, GPIO_PIN_PB2, GPIO_PIN_OUTPUT); 
-  // GpioPinWrite (4, GPIO_PIN_PA2, Enable); // pin 56 W-DISABLE
-  // GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PA2, Enable); // pin 56 W-DISABLE
+  GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 
   // // bluetooth - enable
   // GpioPinWrite (3, GPIO_PIN_PD5, Enable); // pin 54 BT_WAKE_L
