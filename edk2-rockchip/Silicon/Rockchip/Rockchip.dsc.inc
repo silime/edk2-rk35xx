@@ -232,9 +232,9 @@
   # This library provides the instrinsic functions generate by a given compiler.
   # And NULL mean link this library into all ARM images.
   #
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
+  
+  # ARM platforms have SEC modules with standard entry points, so we can generically link StackCheckLib
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
   # RkSdmmcDxe dependencies
   RkSdmmcPlatformLib|Silicon/Rockchip/Library/RkSdmmcPlatformLibNull/RkSdmmcPlatformLibNull.inf
