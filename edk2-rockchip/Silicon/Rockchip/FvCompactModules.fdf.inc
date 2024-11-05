@@ -6,4 +6,4 @@
 #
 ##
 
-  INF ArmPlatformPkg/PrePi/PeiUniCore.inf
+  INF ArmPlatformPkg/PeilessSec/PeilessSec.inf
