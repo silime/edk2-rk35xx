@@ -12,7 +12,7 @@
 #include <Library/TimerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-STATIC UINT8  mCsotDsiInitSequence[] = {
+STATIC UINT8  mOledDsiInitSequence[] = {
 
   0x15, 0x00, 0x02, 0xFE, 0x0E,
 	0x15, 0x00, 0x02, 0x4B, 0x00,
@@ -187,10 +187,9 @@ STATIC ROCKCHIP_DSI_PANEL_PROTOCOL  mOledDsiPanel = {
                  MIPI_DSI_MODE_LPM |
                  MIPI_DSI_MODE_EOT_PACKET,
   .DsiFormat    = MIPI_DSI_FMT_RGB888,
-  .DscEnable    = FALSE
-
-  .InitSequence       = mCsotDsiInitSequence,
-  .InitSequenceLength = ARRAY_SIZE (mCsotDsiInitSequence),
+  .DscEnable    = FALSE,
+  .InitSequence       = mOledDsiInitSequence,
+  .InitSequenceLength = ARRAY_SIZE (mOledDsiInitSequence),
 
   .NativeMode         = {
     .CrtcId     = 2,
