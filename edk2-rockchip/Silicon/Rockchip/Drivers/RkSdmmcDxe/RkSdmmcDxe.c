@@ -123,7 +123,8 @@ RkSdmmcCardDetect (
 
   PresenceState = RkSdmmcGetCardPresenceState ();
 
-  if (PresenceState == RkSdmmcCardPresenceUnsupported) {
+  if ((PresenceState == RkSdmmcCardPresenceUnsupported) ||
+      FixedPcdGetBool (PcdRkSdmmcCardDetectBroken)) {
     return TRUE; // let the driver do software detection
   }
 

@@ -79,6 +79,9 @@
 !ifndef RK_AHCI_ENABLE
   DEFINE RK_AHCI_ENABLE             = TRUE
 !endif
+!ifndef RK_DW_HDMI_QP_ENABLE
+  DEFINE RK_DW_HDMI_QP_ENABLE       = TRUE
+!endif
 
   #
   # RK3588-specific flags
@@ -91,7 +94,6 @@
   # Base platform description
   #
 !include Silicon/Rockchip/Rockchip.dsc.inc
-!include MdePkg/MdeLibs.dsc.inc
 
 ################################################################################
 #
@@ -254,6 +256,7 @@
   # PCI Express 3.0 support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4 # AGGREGATION
 
   #
   # ACPI support flags and default values
@@ -267,8 +270,8 @@
   #
   # Display
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x780
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x438
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
@@ -300,6 +303,7 @@
   # PCI Express 3.0
   #
   gRK3588TokenSpaceGuid.PcdPcie30State|L"Pcie30State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30Supported
+  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|L"Pcie30PhyMode"|gRK3588DxeFormSetGuid|0x0|4 # AGGREGATION
 
   #
   # ACPI / Device Tree
