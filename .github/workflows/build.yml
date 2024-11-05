@@ -42,7 +42,7 @@ jobs:
           - nanopc-t6
           - blade3
           - h88k
-          - SLPad
+          - slpad
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
       - name: Checkout
