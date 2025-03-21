@@ -36,9 +36,6 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
-  # No HDMI output on this platform
-  DEFINE RK_DW_HDMI_QP_ENABLE = FALSE
-
   #
   # RK3588-based platform
   #
@@ -82,6 +79,7 @@
    #
   gRK3588TokenSpaceGuid.PcdDisplayConnectors|{CODE({
      VOP_OUTPUT_IF_MIPI0,
+     VOP_OUTPUT_IF_HDMI0,
      VOP_OUTPUT_IF_DP0
   })}
   # gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|90
