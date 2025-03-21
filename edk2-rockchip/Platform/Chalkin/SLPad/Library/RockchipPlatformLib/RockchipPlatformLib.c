@@ -59,7 +59,9 @@ SdhciEmmcIoMux(
     VOID)
 {
   /* sdmmc0 iomux */
-  /* Do not override, set by earlier boot stages. */
+  BUS_IOC->GPIO2A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); // EMMC_CMD,EMMC_CLKOUT,EMMC_DATASTROBE,EMMC_RSTN
+  BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); // EMMC_D0,EMMC_D1,EMMC_D2,EMMC_D3
+  BUS_IOC->GPIO2D_IOMUX_SEL_H = (0xFFFFUL << 16) | (0x1111); // EMMC_D4,EMMC_D5,EMMC_D6,EMMC_D7
 }
 
 #define NS_CRU_BASE 0xFD7C0000
@@ -320,7 +322,8 @@ PlatformEarlyInit(
   GpioPinWrite (4, GPIO_PIN_PB1, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
 
-  // GpioPinSetFunction(1, GPIO_PIN_PC0, 0); //jdet
+  /* touchscreen reset */
+  GpioPinSetFunction(1, GPIO_PIN_PD3, GPIO_PIN_OUTPUT); 
 
   /* spk-con-gpio */
   GpioPinWrite (4, GPIO_PIN_PA0, TRUE);

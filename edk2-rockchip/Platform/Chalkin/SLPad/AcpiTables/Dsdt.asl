@@ -21,6 +21,12 @@
 #define BOARD_CODEC_GPIO "\\_SB.GPI1"
 #define BOARD_CODEC_GPIO_PIN GPIO_PIN_PD5
 
+#define BOARD_TOUCH_HID "FTTS8719"
+#define BOARD_TOUCH_I2C "\\_SB.I2C3"
+#define BOARD_TOUCH_I2C_ADDR 0x38
+#define BOARD_TOUCH_INT_GPIO "\\_SB.GPI1"
+#define BOARD_TOUCH_INT_GPIO_PIN GPIO_PIN_PD2
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
@@ -44,6 +50,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("Usb3Host0.asl")
     include ("Usb3Host2.asl")
 
+    Scope (I2C3) {
+      include ("Tsc.asl")
+    }
     Scope (I2C7) {
       include ("Es8388.asl")
     }
