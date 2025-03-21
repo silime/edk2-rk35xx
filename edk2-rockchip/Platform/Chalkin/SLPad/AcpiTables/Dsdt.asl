@@ -27,6 +27,10 @@
 #define BOARD_TOUCH_INT_GPIO "\\_SB.GPI1"
 #define BOARD_TOUCH_INT_GPIO_PIN GPIO_PIN_PD2
 
+#define BOARD_BAT_HID "CWFG2015"
+#define BOARD_BAT_I2C "\\_SB.I2C6"
+#define BOARD_BAT_I2C_ADDR 0x62
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
@@ -52,6 +56,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 
     Scope (I2C3) {
       include ("Tsc.asl")
+    }
+    Scope (I2C6) {
+      include ("Bat.asl")
     }
     Scope (I2C7) {
       include ("Es8388.asl")
