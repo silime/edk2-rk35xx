@@ -84,7 +84,7 @@
      VOP_OUTPUT_IF_MIPI0,
      VOP_OUTPUT_IF_DP0
   })}
-  gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|90
+  # gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|90
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
