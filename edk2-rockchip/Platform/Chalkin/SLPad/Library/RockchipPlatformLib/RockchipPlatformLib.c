@@ -12,6 +12,7 @@
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
+#include <Library/TimerLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
 
@@ -347,7 +348,12 @@ PlatformEarlyInit(
   GpioPinSetDirection (4, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
 
   /* touchscreen reset */
-  GpioPinSetFunction(1, GPIO_PIN_PD3, GPIO_PIN_OUTPUT); 
+  GpioPinSetFunction (1, GPIO_PIN_PD3, 0);
+  GpioPinWrite (1, GPIO_PIN_PD3, FALSE);
+  GpioPinSetDirection (1, GPIO_PIN_PD3, GPIO_PIN_OUTPUT);
+  MicroSecondDelay (10 * 1000);
+  GpioPinWrite (1, GPIO_PIN_PD3, TRUE);
+  MicroSecondDelay (200 * 1000);
 
   /* spk-con-gpio */
   GpioPinWrite (4, GPIO_PIN_PA0, TRUE);
