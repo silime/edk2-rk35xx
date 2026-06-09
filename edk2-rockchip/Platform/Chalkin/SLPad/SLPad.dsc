@@ -35,6 +35,7 @@
   # I2C location configured by PCDs below.
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
+  DEFINE RK_I2C_DEMO_ENABLE = TRUE
 
   #
   # RK3588-based platform
@@ -65,9 +66,11 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-slpad-switch"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x51, 0x62, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x6, 0x6, 0x7 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE, TRUE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x51, 0x62, 0x6a, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x6, 0x6, 0x6, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x38, 0x51, 0x62, 0x6a, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x3, 0x6, 0x6, 0x6, 0x7 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }

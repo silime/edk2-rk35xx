@@ -903,12 +903,18 @@ I2cStartRequest (
   I2C_MASTER_CONTEXT  *I2cMasterContext = I2C_SC_FROM_MASTER (This);
   EFI_I2C_OPERATION   *Operation;
   EFI_STATUS          Status = EFI_SUCCESS;
+  EFI_STATUS          StopStatus;
   UINTN               i;
   BOOLEAN             AtRuntime;
   EFI_TPL             Tpl;
 
   ASSERT (RequestPacket != NULL);
   ASSERT (I2cMasterContext != NULL);
+
+  if ((Count > 2) || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
+    DEBUG ((DEBUG_VERBOSE, "Not support more messages now, split them\n"));
+    return EFI_INVALID_PARAMETER;
+  }
 
   AtRuntime = EfiAtRuntime ();
 
@@ -930,11 +936,6 @@ I2cStartRequest (
     //
     // See: https://github.com/edk2-porting/edk2-rk3588/issues/70
     //
-  }
-
-  if ((Count > 2) || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
-    DEBUG ((DEBUG_VERBOSE, "Not support more messages now, split them\n"));
-    return EFI_INVALID_PARAMETER;
   }
 
   for (i = 0; i < Count; i++) {
@@ -972,7 +973,11 @@ I2cStartRequest (
     }
   }
 
-  I2cStop (I2cMasterContext);
+  StopStatus = I2cStop (I2cMasterContext);
+  if (!EFI_ERROR (Status)) {
+    Status = StopStatus;
+  }
+
   I2cDisable (I2cMasterContext);
 
   if (!AtRuntime) {
@@ -982,14 +987,15 @@ I2cStartRequest (
   }
 
   if (I2cStatus != NULL) {
-    *I2cStatus = EFI_SUCCESS;
+    *I2cStatus = Status;
   }
 
   if (Event != NULL) {
     gBS->SignalEvent (Event);
+    return EFI_SUCCESS;
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 STATIC CONST EFI_GUID  DevGuid = I2C_GUID;

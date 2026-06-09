@@ -112,6 +112,9 @@
 !if $(RK_PCA9555_ENABLE) == TRUE
   INF Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
 !endif
+!if $(RK_I2C_DEMO_ENABLE) == TRUE
+  INF Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
+!endif
 
   #
   # Display Support

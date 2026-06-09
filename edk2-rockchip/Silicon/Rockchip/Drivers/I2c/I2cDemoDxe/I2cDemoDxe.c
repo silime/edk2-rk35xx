@@ -43,6 +43,7 @@ I2cDemoSupported (
   EFI_I2C_IO_PROTOCOL  *TmpI2cIo;
   UINT8                *I2cDemoAddresses;
   UINT8                *I2cDemoBuses;
+  UINTN                DeviceCount;
   UINTN                i;
 
   Status = gBS->OpenProtocol (
@@ -54,21 +55,20 @@ I2cDemoSupported (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "I2cDemoSupported Error status: %d\n", Status));
     return EFI_UNSUPPORTED;
   }
 
   /* get I2CDEMO devices' addresses from PCD */
   I2cDemoAddresses = PcdGetPtr (PcdI2cDemoAddresses);
   I2cDemoBuses     = PcdGetPtr (PcdI2cDemoBuses);
-  if (I2cDemoAddresses == 0) {
+  DeviceCount      = MIN (PcdGetSize (PcdI2cDemoAddresses), PcdGetSize (PcdI2cDemoBuses));
+  if ((I2cDemoAddresses == NULL) || (I2cDemoBuses == NULL) || (DeviceCount == 0)) {
     Status = EFI_UNSUPPORTED;
-    DEBUG ((DEBUG_INFO, "I2cDemoSupported: I2C device found, but it's not I2CDEMO\n"));
     goto out;
   }
 
   Status = EFI_UNSUPPORTED;
-  for (i = 0; I2cDemoAddresses[i] != '\0'; i++) {
+  for (i = 0; i < DeviceCount; i++) {
     /* I2C guid must fit and valid DeviceIndex must be provided */
     if (CompareGuid (TmpI2cIo->DeviceGuid, &I2cGuid) &&
         (TmpI2cIo->DeviceIndex == I2C_DEVICE_INDEX (
@@ -76,7 +76,6 @@ I2cDemoSupported (
                                     I2cDemoAddresses[i]
                                     )))
     {
-      DEBUG ((DEBUG_INFO, "I2cDemoSupported: attached to I2CDEMO device\n"));
       Status = EFI_SUCCESS;
       break;
     }

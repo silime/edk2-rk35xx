@@ -619,6 +619,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !if $(RK_PCA9555_ENABLE) == TRUE
   Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
 !endif
+!if $(RK_I2C_DEMO_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
+!endif
 
   #
   # Display Support
@@ -831,6 +834,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
       NULL|Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
+!if $(RK_I2C_DEMO_ENABLE) == TRUE
+      NULL|Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
+!endif
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf

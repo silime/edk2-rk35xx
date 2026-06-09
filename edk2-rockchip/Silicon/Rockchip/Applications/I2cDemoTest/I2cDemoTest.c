@@ -92,6 +92,8 @@ I2cDemoList (
   ROCKCHIP_I2CDEMO_PROTOCOL  *I2cDemoProtocol;
   UINTN                      i;
 
+  HandleBuffer  = NULL;
+  ProtocolCount = 0;
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
                   &gRockchipI2cDemoProtocolGuid,
@@ -99,6 +101,11 @@ I2cDemoList (
                   &ProtocolCount,
                   &HandleBuffer
                   );
+  if (EFI_ERROR (Status)) {
+    Print (L"0 devices found.\n");
+    return Status;
+  }
+
   if (ProtocolCount == 0) {
     Print (L"0 devices found.\n");
   } else {
@@ -196,42 +203,51 @@ ShellCommandRunI2cDemo (
   LIST_ENTRY                 *CheckPackage;
   CHAR16                     *ProblemParam;
   CONST CHAR16               *ValueStr;
-  UINTN                      Bus, Address, XferLength, RegAddress, RegAddressLength, Source;
+  UINTN                      Bus, Address, XferLength, RegAddress, RegAddressLength;
   UINT8                      *Buffer;
   BOOLEAN                    ReadMode, WriteMode;
-  EFI_HANDLE                 Handle, ProtHandle;
+  EFI_HANDLE                 Handle;
+  EFI_HANDLE                 *HandleBuffer;
+  VOID                       *Protocol;
   ROCKCHIP_I2CDEMO_PROTOCOL  *I2cDemoProtocol = NULL;
-  UINTN                      HandleSize, i;
+  UINTN                      HandleCount, i;
   UINTN                      TxData;
 
-  Handle     = NULL;
-  Source     = 0;
-  HandleSize = 2 * sizeof (EFI_HANDLE);
-
-  Status = gBS->LocateHandle (
-                  ByProtocol,
+  Handle       = NULL;
+  HandleBuffer = NULL;
+  HandleCount  = 0;
+  Status = gBS->LocateProtocol (
                   &gRockchipI2cDemoProtocolGuid,
                   NULL,
-                  &HandleSize,
-                  &ProtHandle
+                  &Protocol
                   );
   if (EFI_ERROR (Status)) {
     Print (L"No I2cDemo protocol, connect I2C stack\n");
-    Status = gBS->LocateHandle (
+    Status = gBS->LocateHandleBuffer (
                     ByProtocol,
                     &gEfiI2cMasterProtocolGuid,
                     NULL,
-                    &HandleSize,
-                    &ProtHandle
+                    &HandleCount,
+                    &HandleBuffer
                     );
     if (EFI_ERROR (Status)) {
       Print (L"Failed to locate I2cMaster protocol, abort!\n");
       return SHELL_ABORTED;
     }
 
-    Status = gBS->ConnectController (ProtHandle, NULL, NULL, TRUE);
+    for (i = 0; i < HandleCount; i++) {
+      gBS->ConnectController (HandleBuffer[i], NULL, NULL, TRUE);
+    }
+
+    FreePool (HandleBuffer);
+
+    Status = gBS->LocateProtocol (
+                    &gRockchipI2cDemoProtocolGuid,
+                    NULL,
+                    &Protocol
+                    );
     if (EFI_ERROR (Status)) {
-      Print (L"Cannot connect I2C stack, abort!\n");
+      Print (L"Cannot connect I2C Demo devices, abort!\n");
       return SHELL_ABORTED;
     }
   }
@@ -328,11 +344,11 @@ ShellCommandRunI2cDemo (
 
   if (EFI_ERROR (Status)) {
     Print (L"I2c Operation failed %d.\n", Status);
+    Status = SHELL_DEVICE_ERROR;
   } else {
     Print (L"I2c Operation successfully.\n");
+    Status = SHELL_SUCCESS;
   }
-
-  Status = SHELL_SUCCESS;
 
   FreePool (Buffer);
 out_close:
@@ -353,7 +369,6 @@ ShellI2cDemoTestLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  Print (L"~Filed to add Hii package\n");
   ShellI2cDemoHiiHandle = NULL;
 
   ShellI2cDemoHiiHandle = HiiAddPackages (
