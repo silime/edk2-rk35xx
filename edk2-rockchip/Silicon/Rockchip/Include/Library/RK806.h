@@ -209,4 +209,14 @@ RK806PinSetFunction (
   IN UINT8  Function
   );
 
+RETURN_STATUS
+RK806ReadPowerKeyEvent (
+  OUT BOOLEAN  *Pressed
+  );
+
+RETURN_STATUS
+RK806InitPowerKey (
+  VOID
+  );
+
 #endif

@@ -119,3 +119,6 @@
 
   # Splash screen logo
   $(PLATFORM_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
+
+  # Power and volume buttons
+  Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/ButtonDxe/ButtonDxe.inf

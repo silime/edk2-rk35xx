@@ -1,0 +1,41 @@
+## @file
+# RK3588 power and volume button input driver.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ButtonDxe
+  FILE_GUID                      = 52714fc3-6846-437c-994d-5728876bdd71
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ButtonDxeEntryPoint
+
+[Sources]
+  ButtonDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  RK806
+  SaradcLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+  gRockchipPlatformConfigAppliedProtocolGuid  ## CONSUMES
+
+[Guids]
+  gEfiConsoleInDeviceGuid
+
+[Depex]
+  gRockchipPlatformConfigAppliedProtocolGuid

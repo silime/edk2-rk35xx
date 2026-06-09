@@ -19,6 +19,12 @@
 #define SARADC_CHANNEL_COUNT  8
 #define SARADC_RESOLUTION     12
 #define SARADC_DATA_MASK      (1 << SARADC_RESOLUTION) - 1
+#define SARADC_REFERENCE_UV    1800000
+
+#define SARADC_BUTTON_CHANNEL       1
+#define SARADC_VOLUME_UP_UV         17000
+#define SARADC_VOLUME_DOWN_UV       417000
+#define SARADC_BUTTON_RELEASE_UV    SARADC_REFERENCE_UV
 
 #define SARADC_TIMEOUT_US  100000
 
@@ -112,6 +118,49 @@ SaradcReadChannel (
 
   *Data  = MmioRead32 (SARADC_BASE + SARADC_DATA_BASE + (Channel * sizeof (UINT32)));
   *Data &= SARADC_DATA_MASK;
+
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SaradcReadKey (
+  OUT SARADC_KEY  *Key,
+  OUT UINT32      *Data OPTIONAL
+  )
+{
+  RETURN_STATUS  Status;
+  UINT32         RawData;
+  UINT32         Microvolts;
+  UINT32         VolumeUpDelta;
+  UINT32         VolumeDownDelta;
+  UINT32         ReleaseDelta;
+
+  if (Key == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Status = SaradcReadChannel (SARADC_BUTTON_CHANNEL, &RawData);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Data != NULL) {
+    *Data = RawData;
+  }
+
+  Microvolts = (UINT32)(((UINT64)RawData * SARADC_REFERENCE_UV) /
+                       (1 << SARADC_RESOLUTION));
+  VolumeUpDelta = ABS ((INT32)Microvolts - SARADC_VOLUME_UP_UV);
+  VolumeDownDelta = ABS ((INT32)Microvolts - SARADC_VOLUME_DOWN_UV);
+  ReleaseDelta = ABS ((INT32)Microvolts - SARADC_BUTTON_RELEASE_UV);
+
+  if ((VolumeUpDelta < VolumeDownDelta) && (VolumeUpDelta < ReleaseDelta)) {
+    *Key = SaradcKeyVolumeUp;
+  } else if (VolumeDownDelta < ReleaseDelta) {
+    *Key = SaradcKeyVolumeDown;
+  } else {
+    *Key = SaradcKeyNone;
+  }
 
   return RETURN_SUCCESS;
 }

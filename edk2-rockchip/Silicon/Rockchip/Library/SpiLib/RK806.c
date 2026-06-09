@@ -808,3 +808,61 @@ RK806PinSetFunction (
 
   return pmic_clrsetbits (cs_id, conf->fun_reg, mask, val);
 }
+
+RETURN_STATUS
+RK806ReadPowerKeyEvent (
+  OUT BOOLEAN  *Pressed
+  )
+{
+  RETURN_STATUS  Status;
+  UINT8          InterruptStatus;
+  UINT8          PowerKeyStatus;
+
+  if (Pressed == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  *Pressed = FALSE;
+
+  Status = pmic_reg_read (0, RK806_INT_STS0, &InterruptStatus, 1);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  PowerKeyStatus = InterruptStatus &
+                   (RK806_IRQ_PWRON_FALL_MSK | RK806_IRQ_PWRON_RISE_MSK);
+  if (PowerKeyStatus == 0) {
+    return RETURN_SUCCESS;
+  }
+
+  Status = pmic_reg_write (0, RK806_INT_STS0, &PowerKeyStatus, 1);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  *Pressed = (PowerKeyStatus & RK806_IRQ_PWRON_FALL_MSK) != 0;
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+RK806InitPowerKey (
+  VOID
+  )
+{
+  RETURN_STATUS  Status;
+  UINT8          Value;
+
+  Value  = RK806_IRQ_PWRON_FALL_MSK | RK806_IRQ_PWRON_RISE_MSK;
+  Status = pmic_reg_write (0, RK806_INT_STS0, &Value, 1);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = pmic_reg_read (0, RK806_INT_MSK0, &Value, 1);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  Value &= ~(RK806_IRQ_PWRON_FALL_MSK | RK806_IRQ_PWRON_RISE_MSK);
+  return pmic_reg_write (0, RK806_INT_MSK0, &Value, 1);
+}
