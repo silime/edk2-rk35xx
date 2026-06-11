@@ -8,14 +8,14 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001A
-  BASE_NAME                      = BatteryDxe
+  BASE_NAME                      = Cw2015Dxe
   FILE_GUID                      = 7d8741dc-20c6-40af-a459-1499ab467113
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = BatteryDxeInitialize
+  ENTRY_POINT                    = Cw2015DxeInitialize
 
 [Sources.common]
-  BatteryDxe.c
+  Cw2015Dxe.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec

@@ -6,8 +6,8 @@
  *
  **/
 
-#ifndef __BATTERY_DXE_H__
-#define __BATTERY_DXE_H__
+#ifndef __CW2015_DXE_H__
+#define __CW2015_DXE_H__
 
 #define BATTERY_FORM_ID       0x1008
 #define BATTERY_LABEL_UPDATE  0x1800

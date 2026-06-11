@@ -128,4 +128,4 @@
 
   # Power and volume buttons
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/ButtonDxe/ButtonDxe.inf
-  Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/BatteryDxe/BatteryDxe.inf
+  Silicon/Rockchip/Drivers/I2c/Cw2015Dxe/Cw2015Dxe.inf

@@ -18,7 +18,7 @@
 #include "FanControl.h"
 #include "DebugSerialPort.h"
 #include "Display.h"
-#include "BatteryDxe/BatteryDxe.h"
+#include "../../../Drivers/I2c/Cw2015Dxe/Cw2015Dxe.h"
 
 //
 // EFI Variable attributes

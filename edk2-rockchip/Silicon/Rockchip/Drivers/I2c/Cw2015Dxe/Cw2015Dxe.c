@@ -23,8 +23,8 @@
 #include <Protocol/I2c.h>
 #include <Protocol/I2cIo.h>
 
-#include "../RK3588DxeFormSetGuid.h"
-#include "BatteryDxe.h"
+#include "../../../RK3588/Drivers/RK3588Dxe/RK3588DxeFormSetGuid.h"
+#include "Cw2015Dxe.h"
 
 #define CW2015_REG_VERSION    0x00
 #define CW2015_REG_VCELL      0x02
@@ -405,7 +405,7 @@ RefreshNotify (
 STATIC
 EFI_STATUS
 EFIAPI
-BatterySupported (
+Cw2015Supported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -429,7 +429,7 @@ BatterySupported (
 STATIC
 EFI_STATUS
 EFIAPI
-BatteryStart (
+Cw2015Start (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -477,7 +477,7 @@ BatteryStart (
 STATIC
 EFI_STATUS
 EFIAPI
-BatteryStop (
+Cw2015Stop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN UINTN                        NumberOfChildren,
@@ -488,14 +488,14 @@ BatteryStop (
 }
 
 STATIC EFI_DRIVER_BINDING_PROTOCOL  mDriverBinding = {
-  BatterySupported,
-  BatteryStart,
-  BatteryStop
+  Cw2015Supported,
+  Cw2015Start,
+  Cw2015Stop
 };
 
 EFI_STATUS
 EFIAPI
-BatteryDxeInitialize (
+Cw2015DxeInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
