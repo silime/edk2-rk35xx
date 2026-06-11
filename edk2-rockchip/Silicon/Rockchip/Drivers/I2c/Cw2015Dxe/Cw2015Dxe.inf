@@ -45,6 +45,14 @@
 [Pcd]
   gRK3588TokenSpaceGuid.PcdBatteryI2cAddress
   gRK3588TokenSpaceGuid.PcdBatteryI2cBus
+  gRK3588TokenSpaceGuid.PcdBq25890StatusValid
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeStatus
+  gRK3588TokenSpaceGuid.PcdBq25890InputSource
+  gRK3588TokenSpaceGuid.PcdBq25890Fault
+  gRK3588TokenSpaceGuid.PcdBq25890BatteryVoltageMv
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeCurrentMa
+  gRK3588TokenSpaceGuid.PcdBq25890ChargePowerMw
+  gRK3588TokenSpaceGuid.PcdBq25890VbusVoltageMv
 
 [Depex]
   TRUE

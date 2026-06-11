@@ -22,6 +22,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/I2c.h>
 #include <Protocol/I2cIo.h>
+#include <BatteryCharger.h>
 
 #include "../../../RK3588/Drivers/RK3588Dxe/RK3588DxeFormSetGuid.h"
 #include "Cw2015Dxe.h"
@@ -56,7 +57,7 @@ typedef struct {
   UINT8                  Soc;
   UINT16                 VoltageMv;
   UINT16                 RemainingMinutes;
-  EFI_STRING_ID          FormStrings[10];
+  EFI_STRING_ID          FormStrings[22];
 } CW2015_CONTEXT;
 
 STATIC CONST EFI_GUID  mI2cGuid = ROCKCHIP_I2C_DEVICE_GUID;
@@ -289,6 +290,89 @@ Cw2015Refresh (
 }
 
 STATIC
+CONST CHAR16 *
+ChargeStatusString (
+  IN UINT32  Status
+  )
+{
+  switch (Status) {
+    case BATTERY_CHARGE_STATUS_NOT_CHARGING:
+      return L"Not charging";
+    case BATTERY_CHARGE_STATUS_PRECHARGE:
+      return L"Pre-charge";
+    case BATTERY_CHARGE_STATUS_FAST_CHARGE:
+      return L"Fast charging";
+    case BATTERY_CHARGE_STATUS_DONE:
+      return L"Charge complete";
+    case BATTERY_CHARGE_STATUS_DISCHARGING:
+      return L"Discharging";
+    case BATTERY_CHARGE_STATUS_OTG:
+      return L"Discharging (OTG source)";
+    case BATTERY_CHARGE_STATUS_FAULT:
+      return L"Charger fault";
+    case BATTERY_CHARGE_STATUS_UNKNOWN:
+    default:
+      return L"Unknown";
+  }
+}
+
+STATIC
+CONST CHAR16 *
+InputSourceString (
+  IN UINT32  Source
+  )
+{
+  STATIC CONST CHAR16  *Sources[] = {
+    L"No input", L"USB SDP", L"USB CDP", L"USB DCP",
+    L"High-voltage DCP", L"Unknown adapter", L"Non-standard adapter", L"OTG"
+  };
+
+  return Source < ARRAY_SIZE (Sources) ? Sources[Source] : L"Unknown";
+}
+
+STATIC
+CONST CHAR16 *
+ChargerFaultString (
+  IN UINT32  Fault
+  )
+{
+  if ((Fault & BIT7) != 0) {
+    return L"Watchdog expired";
+  }
+  if ((Fault & BIT6) != 0) {
+    return L"Boost/OTG fault";
+  }
+
+  switch ((Fault >> 4) & 0x3) {
+    case 1:
+      return L"Input fault";
+    case 2:
+      return L"Thermal shutdown";
+    case 3:
+      return L"Charge safety timer expired";
+    default:
+      break;
+  }
+
+  if ((Fault & BIT3) != 0) {
+    return L"Battery overvoltage";
+  }
+
+  switch (Fault & 0x7) {
+    case 2:
+      return L"Battery warm";
+    case 3:
+      return L"Battery cool";
+    case 5:
+      return L"Battery cold";
+    case 6:
+      return L"Battery hot";
+    default:
+      return L"None";
+  }
+}
+
+STATIC
 EFI_STRING_ID
 SetFormString (
   IN     EFI_HII_HANDLE  HiiHandle,
@@ -317,6 +401,7 @@ UpdateBatteryForm (
   VOID                *StartHandle;
   VOID                *EndHandle;
   EFI_IFR_GUID_LABEL  *Label;
+  UINT32              ChargeStatus;
 
   if (Context->HiiHandle == NULL) {
     Handles = HiiGetHiiHandles (&gRK3588DxeFormSetGuid);
@@ -370,7 +455,27 @@ UpdateBatteryForm (
       Context->RemainingMinutes % 60
       )
     );
-  HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[8], L"Charging Status"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[9], L"Unknown (reserved)"));
+  if (!PcdGetBool (PcdBq25890StatusValid)) {
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[8], L"Charging Status"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[9], L"Unavailable"));
+  } else {
+    ChargeStatus = PcdGet32 (PcdBq25890ChargeStatus);
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[8], L"Charging Status"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[9], L"%s", ChargeStatusString (ChargeStatus)));
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[10], L"Charger Input"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[11], L"%s (%u mV)", InputSourceString (PcdGet32 (PcdBq25890InputSource)), PcdGet32 (PcdBq25890VbusVoltageMv)));
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[12], L"Charge Current"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[13], L"%u mA", PcdGet32 (PcdBq25890ChargeCurrentMa)));
+    if ((ChargeStatus == BATTERY_CHARGE_STATUS_PRECHARGE) ||
+        (ChargeStatus == BATTERY_CHARGE_STATUS_FAST_CHARGE))
+    {
+      HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[14], L"Charge/Discharge Power"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[15], L"%u mW charging", PcdGet32 (PcdBq25890ChargePowerMw)));
+    } else if ((ChargeStatus == BATTERY_CHARGE_STATUS_DISCHARGING) ||
+               (ChargeStatus == BATTERY_CHARGE_STATUS_OTG))
+    {
+      HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[14], L"Charge/Discharge Power"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[15], L"Unavailable while discharging"));
+    } else {
+      HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[14], L"Charge/Discharge Power"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[15], L"0 mW"));
+    }
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[16], L"Charger Battery ADC"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[17], L"%u mV", PcdGet32 (PcdBq25890BatteryVoltageMv)));
+    HiiCreateTextOpCode (StartHandle, SetFormString (Context->HiiHandle, &Context->FormStrings[18], L"Charger Fault"), 0, SetFormString (Context->HiiHandle, &Context->FormStrings[19], L"%s (0x%02x)", ChargerFaultString (PcdGet32 (PcdBq25890Fault)), PcdGet32 (PcdBq25890Fault)));
+  }
 
   HiiUpdateForm (Context->HiiHandle, &gRK3588DxeFormSetGuid, BATTERY_FORM_ID, StartHandle, EndHandle);
   Context->FormInstalled = TRUE;
