@@ -126,6 +126,7 @@
 
   gRK3588TokenSpaceGuid.PcdI2S0Supported
   gRK3588TokenSpaceGuid.PcdI2S1Supported
+  gRK3588TokenSpaceGuid.PcdBatterySupported
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectors
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask

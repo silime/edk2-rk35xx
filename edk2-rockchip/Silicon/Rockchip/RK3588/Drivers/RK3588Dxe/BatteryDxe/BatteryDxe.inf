@@ -1,0 +1,50 @@
+## @file
+#
+#  CW2015 gas gauge driver.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BatteryDxe
+  FILE_GUID                      = 7d8741dc-20c6-40af-a459-1499ab467113
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BatteryDxeInitialize
+
+[Sources.common]
+  BatteryDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiI2cIoProtocolGuid
+
+[Guids]
+  gEfiIfrTianoGuid
+  gRK3588DxeFormSetGuid
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdBatteryI2cAddress
+  gRK3588TokenSpaceGuid.PcdBatteryI2cBus
+
+[Depex]
+  TRUE

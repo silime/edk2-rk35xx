@@ -72,6 +72,10 @@
   gRK3588TokenSpaceGuid.PcdI2S0Supported|FALSE|BOOLEAN|0x00010701
   gRK3588TokenSpaceGuid.PcdI2S1Supported|FALSE|BOOLEAN|0x00010702
 
+  gRK3588TokenSpaceGuid.PcdBatterySupported|FALSE|BOOLEAN|0x00010901
+  gRK3588TokenSpaceGuid.PcdBatteryI2cBus|0|UINT8|0x00010902
+  gRK3588TokenSpaceGuid.PcdBatteryI2cAddress|0x62|UINT8|0x00010903
+
   gRK3588TokenSpaceGuid.PcdDisplayConnectors|{ 0x0 }|UINT32[]|0x00010801 {
     <Packages>
       Silicon/Rockchip/RockchipPkg.dec

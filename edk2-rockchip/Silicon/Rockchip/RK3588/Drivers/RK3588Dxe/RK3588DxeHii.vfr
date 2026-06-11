@@ -18,6 +18,7 @@
 #include "FanControl.h"
 #include "DebugSerialPort.h"
 #include "Display.h"
+#include "BatteryDxe/BatteryDxe.h"
 
 //
 // EFI Variable attributes
@@ -288,6 +289,12 @@ formset
       goto 0x1007,
         prompt = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE),
         help = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_HELP);
+
+#if FixedPcdGetBool (PcdBatterySupported)
+      goto BATTERY_FORM_ID,
+        prompt = STRING_TOKEN(STR_BATTERY_FORM_TITLE),
+        help = STRING_TOKEN(STR_BATTERY_FORM_HELP);
+#endif
     endform;
 
     form formid = 0x1000,
@@ -944,5 +951,16 @@ formset
         subtitle text = STRING_TOKEN(STR_NULL_STRING);
         subtitle text = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_SUBTITLE);
     endform;
+
+#if FixedPcdGetBool (PcdBatterySupported)
+    form formid = BATTERY_FORM_ID,
+        title = STRING_TOKEN(STR_BATTERY_FORM_TITLE);
+        label BATTERY_LABEL_UPDATE;
+        text
+          help = STRING_TOKEN(STR_BATTERY_FORM_HELP),
+          text = STRING_TOKEN(STR_BATTERY_UNAVAILABLE);
+        label BATTERY_LABEL_END;
+    endform;
+#endif
 
 endformset;
