@@ -110,6 +110,14 @@ typedef struct {
   UINT32    State;
 } USBDP_PHY_USB3_STATE_VARSTORE_DATA;
 
+#define TYPEC_ROLE_DUAL    0
+#define TYPEC_ROLE_SINK    1
+#define TYPEC_ROLE_SOURCE  2
+
+typedef struct {
+  UINT32    Role;
+} TYPEC_ROLE_VARSTORE_DATA;
+
 typedef struct {
   UINT64    Value;
 } DEBUG_SERIAL_PORT_BAUD_RATE_VARSTORE_DATA;

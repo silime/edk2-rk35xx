@@ -319,6 +319,18 @@
 #string STR_BATTERY_FORM_TITLE                             #language en-US "Battery"
 #string STR_BATTERY_FORM_HELP                              #language en-US "View information reported by the CW2015 gas gauge."
 #string STR_BATTERY_UNAVAILABLE                            #language en-US "Battery information is unavailable."
+
+/*
+ * USB Type-C information
+ */
+#string STR_TYPEC_FORM_TITLE                               #language en-US "Type-C"
+#string STR_TYPEC_FORM_HELP                                #language en-US "View USB Type-C role and VBUS status reported by the FUSB302 controller."
+#string STR_TYPEC_UNAVAILABLE                              #language en-US "USB Type-C information is unavailable."
+#string STR_TYPEC_ROLE_PROMPT                              #language en-US "Preferred Role"
+#string STR_TYPEC_ROLE_HELP                                #language en-US "Select the Type-C power role. The change is applied after reboot."
+#string STR_TYPEC_ROLE_DUAL                                #language en-US "Dual Role"
+#string STR_TYPEC_ROLE_SINK                                #language en-US "Sink"
+#string STR_TYPEC_ROLE_SOURCE                              #language en-US "Source"
 #string STR_DEBUG_SERIAL_PORT_SUBTITLE                     #language en-US "Note: These settings only take effect in UEFI and might be overridden by the OS. Earlier boot messages will be printed at the default settings."
 
 #string STR_DEBUG_SERIAL_PORT_BAUD_RATE_PROMPT             #language en-US "Baud Rate"

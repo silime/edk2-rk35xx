@@ -1,0 +1,43 @@
+## @file
+#
+#  Type-C power policy driver.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = TypecPowerPolicyDxe
+  FILE_GUID                      = 2bbd1c7d-40aa-4cc0-8d7a-2b0f0a2e8081
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TypecPowerPolicyDxeInitialize
+
+[Sources.common]
+  TypecPowerPolicyDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  GpioLib
+  MemoryAllocationLib
+  PcdLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdTypecRole
+
+[Protocols]
+  gBq25890ControlProtocolGuid
+  gFusb302StateProtocolGuid
+
+[Depex]
+  gBq25890ControlProtocolGuid AND gFusb302StateProtocolGuid

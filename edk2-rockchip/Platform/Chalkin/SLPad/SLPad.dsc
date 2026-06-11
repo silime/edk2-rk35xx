@@ -66,11 +66,11 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-slpad-switch"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x51, 0x62, 0x6a, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x6, 0x6, 0x6, 0x7 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE }
-  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x38, 0x51, 0x6a, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x3, 0x6, 0x6, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x51, 0x62, 0x6a, 0x22, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x6, 0x6, 0x6, 0x6, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x38, 0x51, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x3, 0x6, 0x7 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
@@ -79,6 +79,12 @@
   gRK3588TokenSpaceGuid.PcdBatterySupported|TRUE
   gRK3588TokenSpaceGuid.PcdBatteryI2cBus|0x6
   gRK3588TokenSpaceGuid.PcdBatteryI2cAddress|0x62
+  gRK3588TokenSpaceGuid.PcdTypecSupported|TRUE
+  gRK3588TokenSpaceGuid.PcdTypecRoleDefault|$(TYPEC_ROLE_DUAL)
+  gRK3588TokenSpaceGuid.PcdFusb302I2cBus|0x6
+  gRK3588TokenSpaceGuid.PcdFusb302I2cAddress|0x22
+  gRK3588TokenSpaceGuid.PcdBq25890I2cBus|0x6
+  gRK3588TokenSpaceGuid.PcdBq25890I2cAddress|0x6a
   
   #
    # Display support flags and default values
@@ -129,3 +135,6 @@
   # Power and volume buttons
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/ButtonDxe/ButtonDxe.inf
   Silicon/Rockchip/Drivers/I2c/Cw2015Dxe/Cw2015Dxe.inf
+  Silicon/Rockchip/Drivers/I2c/Bq25890Dxe/Bq25890Dxe.inf
+  Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf
+  Silicon/Rockchip/Drivers/I2c/TypecPowerPolicyDxe/TypecPowerPolicyDxe.inf

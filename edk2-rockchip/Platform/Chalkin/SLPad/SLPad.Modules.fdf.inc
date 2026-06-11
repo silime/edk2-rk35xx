@@ -18,3 +18,6 @@
   # Power and volume buttons
   INF Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/ButtonDxe/ButtonDxe.inf
   INF Silicon/Rockchip/Drivers/I2c/Cw2015Dxe/Cw2015Dxe.inf
+  INF Silicon/Rockchip/Drivers/I2c/Bq25890Dxe/Bq25890Dxe.inf
+  INF Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf
+  INF Silicon/Rockchip/Drivers/I2c/TypecPowerPolicyDxe/TypecPowerPolicyDxe.inf

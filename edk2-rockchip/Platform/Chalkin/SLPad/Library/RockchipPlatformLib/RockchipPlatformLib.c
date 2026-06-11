@@ -343,8 +343,9 @@ EFIAPI
 PlatformEarlyInit(
     VOID)
 {
-  /* vcc_5v0_en */
-  GpioPinWrite (4, GPIO_PIN_PB1, TRUE);
+  /* Type-C OTG VBUS is enabled later by Bq25890Dxe in source mode. */
+  GpioPinSetFunction (4, GPIO_PIN_PB1, 0);
+  GpioPinWrite (4, GPIO_PIN_PB1, FALSE);
   GpioPinSetDirection (4, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
 
   /* touchscreen reset */

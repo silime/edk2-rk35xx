@@ -337,6 +337,18 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|100
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|31
 
+  #
+  # Battery charger runtime status
+  #
+  gRK3588TokenSpaceGuid.PcdBq25890StatusValid|FALSE
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeStatus|0
+  gRK3588TokenSpaceGuid.PcdBq25890InputSource|0
+  gRK3588TokenSpaceGuid.PcdBq25890Fault|0
+  gRK3588TokenSpaceGuid.PcdBq25890BatteryVoltageMv|0
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeCurrentMa|0
+  gRK3588TokenSpaceGuid.PcdBq25890ChargePowerMw|0
+  gRK3588TokenSpaceGuid.PcdBq25890VbusVoltageMv|0
+
 [PcdsDynamicHii.common.DEFAULT]
   #
   # CPU Performance
@@ -390,6 +402,11 @@
   #
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|L"UsbDpPhy0Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|L"UsbDpPhy1Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
+
+  #
+  # USB Type-C
+  #
+  gRK3588TokenSpaceGuid.PcdTypecRole|L"TypecRole"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdTypecRoleDefault
 
   #
   # Display

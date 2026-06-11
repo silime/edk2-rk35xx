@@ -24,6 +24,7 @@
   ConfigTable.c
   FanControl.c
   UsbDpPhy.c
+  Typec.c
   DebugSerialPort.c
   Display.c
 
@@ -127,6 +128,9 @@
   gRK3588TokenSpaceGuid.PcdI2S0Supported
   gRK3588TokenSpaceGuid.PcdI2S1Supported
   gRK3588TokenSpaceGuid.PcdBatterySupported
+  gRK3588TokenSpaceGuid.PcdTypecSupported
+  gRK3588TokenSpaceGuid.PcdTypecRoleDefault
+  gRK3588TokenSpaceGuid.PcdTypecRole
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectors
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask

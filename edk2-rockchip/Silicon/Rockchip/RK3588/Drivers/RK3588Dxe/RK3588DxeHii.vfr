@@ -19,6 +19,7 @@
 #include "DebugSerialPort.h"
 #include "Display.h"
 #include "../../../Drivers/I2c/Cw2015Dxe/Cw2015Dxe.h"
+#include "../../../Drivers/I2c/Fusb302Dxe/Fusb302Dxe.h"
 
 //
 // EFI Variable attributes
@@ -169,6 +170,11 @@ formset
       name  = UsbDpPhy1Usb3State,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore TYPEC_ROLE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = TypecRole,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore PCIE30_STATE_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = Pcie30State,
@@ -294,6 +300,12 @@ formset
       goto BATTERY_FORM_ID,
         prompt = STRING_TOKEN(STR_BATTERY_FORM_TITLE),
         help = STRING_TOKEN(STR_BATTERY_FORM_HELP);
+#endif
+
+#if FixedPcdGetBool (PcdTypecSupported)
+      goto TYPEC_FORM_ID,
+        prompt = STRING_TOKEN(STR_TYPEC_FORM_TITLE),
+        help = STRING_TOKEN(STR_TYPEC_FORM_HELP);
 #endif
     endform;
 
@@ -960,6 +972,27 @@ formset
           help = STRING_TOKEN(STR_BATTERY_FORM_HELP),
           text = STRING_TOKEN(STR_BATTERY_UNAVAILABLE);
         label BATTERY_LABEL_END;
+    endform;
+#endif
+
+#if FixedPcdGetBool (PcdTypecSupported)
+    form formid = TYPEC_FORM_ID,
+        title = STRING_TOKEN(STR_TYPEC_FORM_TITLE);
+        oneof varid = TypecRole.Role,
+          prompt      = STRING_TOKEN(STR_TYPEC_ROLE_PROMPT),
+          help        = STRING_TOKEN(STR_TYPEC_ROLE_HELP),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGet32 (PcdTypecRoleDefault),
+          option text = STRING_TOKEN(STR_TYPEC_ROLE_DUAL), value = TYPEC_ROLE_DUAL, flags = 0;
+          option text = STRING_TOKEN(STR_TYPEC_ROLE_SINK), value = TYPEC_ROLE_SINK, flags = 0;
+          option text = STRING_TOKEN(STR_TYPEC_ROLE_SOURCE), value = TYPEC_ROLE_SOURCE, flags = 0;
+        endoneof;
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+        label TYPEC_LABEL_UPDATE;
+        text
+          help = STRING_TOKEN(STR_TYPEC_FORM_HELP),
+          text = STRING_TOKEN(STR_TYPEC_UNAVAILABLE);
+        label TYPEC_LABEL_END;
     endform;
 #endif
 
