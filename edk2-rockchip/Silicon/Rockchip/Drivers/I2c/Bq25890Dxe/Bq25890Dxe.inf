@@ -1,0 +1,54 @@
+## @file
+#
+#  TI BQ25890 charger driver.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Bq25890Dxe
+  FILE_GUID                      = 901fc545-1562-48aa-9304-456fd9d637f7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Bq25890DxeInitialize
+
+[Sources.common]
+  Bq25890Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  GpioLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiI2cIoProtocolGuid
+  gBq25890ControlProtocolGuid
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdBq25890I2cAddress
+  gRK3588TokenSpaceGuid.PcdBq25890I2cBus
+  gRK3588TokenSpaceGuid.PcdTypecRole
+  gRK3588TokenSpaceGuid.PcdBq25890StatusValid
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeStatus
+  gRK3588TokenSpaceGuid.PcdBq25890InputSource
+  gRK3588TokenSpaceGuid.PcdBq25890Fault
+  gRK3588TokenSpaceGuid.PcdBq25890BatteryVoltageMv
+  gRK3588TokenSpaceGuid.PcdBq25890ChargeCurrentMa
+  gRK3588TokenSpaceGuid.PcdBq25890ChargePowerMw
+  gRK3588TokenSpaceGuid.PcdBq25890VbusVoltageMv
+
+[Depex]
+  TRUE
