@@ -1,0 +1,54 @@
+## @file
+#
+#  FUSB302 USB Type-C controller driver.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Fusb302Dxe
+  FILE_GUID                      = 551b0400-f9b5-4208-b3bf-0dd9f3dc1834
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Fusb302DxeInitialize
+
+[Sources.common]
+  Fusb302Dxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  GpioLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiI2cIoProtocolGuid
+  gFusb302StateProtocolGuid
+
+[Guids]
+  gEfiIfrTianoGuid
+  gRK3588DxeFormSetGuid
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdFusb302I2cAddress
+  gRK3588TokenSpaceGuid.PcdFusb302I2cBus
+  gRK3588TokenSpaceGuid.PcdTypecRole
+
+[Depex]
+  TRUE
