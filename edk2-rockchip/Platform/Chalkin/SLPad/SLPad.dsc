@@ -81,6 +81,10 @@
   gRK3588TokenSpaceGuid.PcdBatteryI2cAddress|0x62
   gRK3588TokenSpaceGuid.PcdTypecSupported|TRUE
   gRK3588TokenSpaceGuid.PcdTypecRoleDefault|$(TYPEC_ROLE_DUAL)
+  gRK3588TokenSpaceGuid.PcdBluetoothSupported|TRUE
+  gRK3588TokenSpaceGuid.PcdBluetoothStateDefault|$(DEVICE_STATE_ENABLED)
+  gRK3588TokenSpaceGuid.PcdWifiSupported|TRUE
+  gRK3588TokenSpaceGuid.PcdWifiStateDefault|$(DEVICE_STATE_DISABLED)
   gRK3588TokenSpaceGuid.PcdFusb302I2cBus|0x6
   gRK3588TokenSpaceGuid.PcdFusb302I2cAddress|0x22
   gRK3588TokenSpaceGuid.PcdBq25890I2cBus|0x6

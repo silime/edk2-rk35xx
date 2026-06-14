@@ -43,4 +43,26 @@ Device (SDIO) {
       Package () { "sd-uhs-sdr104", 1 },
     }
   })
+
+  Device (WLN0) {
+    Name (_ADR, 1)
+    Name (_UID, 0)
+    Name (_CCA, 0)
+    Name (_STA, 0x0F)
+    Name (_DEP, Package () { \_SB.GPI0, \_SB.SDIO })
+
+    Name (_CRS, ResourceTemplate () {
+      GpioInt (Level, ActiveHigh, ExclusiveAndWake, PullDown, 0x0000,
+        "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
+        { GPIO_PIN_PB7 }
+    })
+
+    Name (_DSD, Package () {
+      ToUUID ("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
+      Package () {
+        Package () { "compatible", "brcm,bcm4329-fmac" },
+        Package () { "wifi-chip-type", "ap6398sv" },
+      }
+    })
+  }
 }

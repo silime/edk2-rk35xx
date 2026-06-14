@@ -35,9 +35,7 @@ Device (UAR9) {
   })
   Name (_DEP, Package () { \_SB.DMA2 })
 
-  Method (_STA, 0, NotSerialized) {
-    Return (0x0F)
-  }
+  Name (_STA, 0x0F)
 }
 
 Device (BTH0) {
@@ -82,7 +80,5 @@ Device (BTH0) {
     }
   })
 
-  Method (_STA, 0, NotSerialized) {
-    Return (0x0F)
-  }
+  Name (_STA, 0x0F)
 }

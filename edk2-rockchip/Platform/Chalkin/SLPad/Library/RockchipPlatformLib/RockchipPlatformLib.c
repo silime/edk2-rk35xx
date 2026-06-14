@@ -7,7 +7,6 @@
  **/
 #include <Base.h>
 #include <Library/DebugLib.h>
-#include <Library/CruLib.h>
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
@@ -344,61 +343,6 @@ EFIAPI
 PlatformEarlyInit(
     VOID)
 {
-  HAL_CRU_ClkEnable (HCLK_SDIO_ROOT_GATE);
-  HAL_CRU_ClkEnable (HCLK_SDIO_NIU_GATE);
-  HAL_CRU_ClkEnable (HCLK_SDIO_GATE);
-  HAL_CRU_ClkEnable (CCLK_SRC_SDIO_GATE);
-  HAL_CRU_ClkSetFreq (CCLK_SRC_SDIO, 150000000);
-  HAL_CRU_RstDeassert (SRST_H_SDIO_NIU);
-  HAL_CRU_RstDeassert (SRST_H_SDIO);
-  HAL_CRU_RstDeassert (SRST_SDIO);
-
-  /* SDIO M1 for the on-board AP6398SV Wi-Fi controller. */
-  GpioPinSetFunction (3, GPIO_PIN_PA5, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA5, GPIO_PIN_PULL_NONE);
-  GpioPinSetFunction (3, GPIO_PIN_PA4, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA4, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (3, GPIO_PIN_PA0, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA0, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (3, GPIO_PIN_PA1, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA1, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (3, GPIO_PIN_PA2, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA2, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (3, GPIO_PIN_PA3, 2);
-  GpioPinSetPull (3, GPIO_PIN_PA3, GPIO_PIN_PULL_UP);
-
-  /* Match the mmc-pwrseq-simple reset sequence from the board DTS. */
-  GpioPinSetFunction (0, GPIO_PIN_PC4, 0);
-  GpioPinSetPull (0, GPIO_PIN_PC4, GPIO_PIN_PULL_UP);
-  GpioPinWrite (0, GPIO_PIN_PC4, FALSE);
-  GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
-  MicroSecondDelay (10 * 1000);
-  GpioPinWrite (0, GPIO_PIN_PC4, TRUE);
-  MicroSecondDelay (200 * 1000);
-
-  HAL_CRU_ClkEnable (PCLK_UART9_GATE);
-  HAL_CRU_ClkEnable (SCLK_UART9_GATE);
-  HAL_CRU_RstDeassert (SRST_P_UART9);
-  HAL_CRU_RstDeassert (SRST_S_UART9);
-
-  /* UART9 M0 with RTS/CTS for the BCM4345C5 Bluetooth controller. */
-  GpioPinSetFunction (2, GPIO_PIN_PC4, 10);
-  GpioPinSetPull (2, GPIO_PIN_PC4, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (2, GPIO_PIN_PC2, 10);
-  GpioPinSetPull (2, GPIO_PIN_PC2, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (4, GPIO_PIN_PC5, 10);
-  GpioPinSetPull (4, GPIO_PIN_PC5, GPIO_PIN_PULL_NONE);
-  GpioPinSetFunction (4, GPIO_PIN_PC4, 10);
-  GpioPinSetPull (4, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
-
-  GpioPinSetFunction (0, GPIO_PIN_PC5, 0);
-  GpioPinSetPull (0, GPIO_PIN_PC5, GPIO_PIN_PULL_UP);
-  GpioPinSetFunction (0, GPIO_PIN_PA0, 0);
-  GpioPinSetPull (0, GPIO_PIN_PA0, GPIO_PIN_PULL_DOWN);
-  GpioPinSetDirection (0, GPIO_PIN_PA0, GPIO_PIN_INPUT);
-  GpioPinSetFunction (0, GPIO_PIN_PC6, 0);
-  GpioPinSetPull (0, GPIO_PIN_PC6, GPIO_PIN_PULL_NONE);
-
   /* Type-C OTG VBUS is enabled later by Bq25890Dxe in source mode. */
   GpioPinSetFunction (4, GPIO_PIN_PB1, 0);
   GpioPinWrite (4, GPIO_PIN_PB1, FALSE);
