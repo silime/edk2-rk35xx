@@ -14,7 +14,7 @@
 #include "AcpiTables.h"
 
 Device(UAR2) {
-  Name (_HID, "HISI0031")
+  Name (_HID, "RKCP3008")
   Name (_UID, 2)
   Name (_CRS, ResourceTemplate() {
     Memory32Fixed(ReadWrite, 0xfeb50000, 0x1000)
@@ -24,11 +24,15 @@ Device(UAR2) {
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
     Package () {
+      Package () { "rockchip,dma", "DMA0" },
+      Package () { "rockchip,tx", 10 },
+      Package () { "rockchip,rx", 11 },
       Package () { "reg-shift", 2 },
       Package () { "reg-io-width", 4 },
       Package () { "clock-frequency", 24000000 },
     }
   })
+Name (_DEP, Package () { \_SB.DMA0 })
 
   Method (_STA, 0, NotSerialized) {
     Return(0x0F)
