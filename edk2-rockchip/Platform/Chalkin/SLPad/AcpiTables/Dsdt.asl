@@ -31,6 +31,20 @@
 #define BOARD_BAT_I2C "\\_SB.I2C6"
 #define BOARD_BAT_I2C_ADDR 0x62
 
+#define BOARD_FUSB302_HID "FUSB302"
+#define BOARD_FUSB302_I2C "\\_SB.I2C6"
+#define BOARD_FUSB302_I2C_ADDR 0x22
+#define BOARD_FUSB302_INT_GPIO "\\_SB.GPI0"
+#define BOARD_FUSB302_INT_GPIO_PIN GPIO_PIN_PD3
+
+#define BOARD_BQ25890_HID "TIQ2589"
+#define BOARD_BQ25890_I2C "\\_SB.I2C6"
+#define BOARD_BQ25890_I2C_ADDR 0x6A
+#define BOARD_BQ25890_INT_GPIO "\\_SB.GPI4"
+#define BOARD_BQ25890_INT_GPIO_PIN GPIO_PIN_PB0
+#define BOARD_BQ25890_OTG_GPIO "\\_SB.GPI4"
+#define BOARD_BQ25890_OTG_GPIO_PIN GPIO_PIN_PB1
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
@@ -42,11 +56,13 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("Sata.asl")
     include ("Emmc.asl")
     include ("Sdhc.asl")
+    include ("Sdio.asl")
     include ("Dma.asl")
 
     include ("Gpio.asl")
     include ("I2c.asl")
     include ("Uart.asl")
+    include ("Uart9.asl")
 
     include ("I2s.asl")
 
@@ -59,9 +75,12 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     }
     Scope (I2C6) {
       include ("Bat.asl")
+      include ("Typec.asl")
     }
     Scope (I2C7) {
       include ("Es8388.asl")
     }
   }
+
+  include ("Mpp.asl")
 }
