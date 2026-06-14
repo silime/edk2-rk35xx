@@ -25,6 +25,7 @@
   FanControl.c
   UsbDpPhy.c
   Typec.c
+  DeviceConfig.c
   DebugSerialPort.c
   Display.c
 
@@ -131,6 +132,12 @@
   gRK3588TokenSpaceGuid.PcdTypecSupported
   gRK3588TokenSpaceGuid.PcdTypecRoleDefault
   gRK3588TokenSpaceGuid.PcdTypecRole
+  gRK3588TokenSpaceGuid.PcdBluetoothSupported
+  gRK3588TokenSpaceGuid.PcdBluetoothStateDefault
+  gRK3588TokenSpaceGuid.PcdBluetoothState
+  gRK3588TokenSpaceGuid.PcdWifiSupported
+  gRK3588TokenSpaceGuid.PcdWifiStateDefault
+  gRK3588TokenSpaceGuid.PcdWifiState
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectors
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask

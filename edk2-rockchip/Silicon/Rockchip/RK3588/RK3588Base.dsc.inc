@@ -409,6 +409,12 @@
   gRK3588TokenSpaceGuid.PcdTypecRole|L"TypecRole"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdTypecRoleDefault
 
   #
+  # Device Configuration
+  #
+  gRK3588TokenSpaceGuid.PcdBluetoothState|L"BluetoothState"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdBluetoothStateDefault
+  gRK3588TokenSpaceGuid.PcdWifiState|L"WifiState"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdWifiStateDefault
+
+  #
   # Display
   #
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|L"DisplayConnectorsMask"|gRK3588DxeFormSetGuid|0x0|0|BS

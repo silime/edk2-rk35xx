@@ -56,6 +56,10 @@
   gRK3588TokenSpaceGuid.PcdPcie30x2Supported
   gRK3588TokenSpaceGuid.PcdPcie30State
   gRK3588TokenSpaceGuid.PcdPcie30PhyMode
+  gRK3588TokenSpaceGuid.PcdBluetoothState
+  gRK3588TokenSpaceGuid.PcdBluetoothSupported
+  gRK3588TokenSpaceGuid.PcdWifiState
+  gRK3588TokenSpaceGuid.PcdWifiSupported
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 

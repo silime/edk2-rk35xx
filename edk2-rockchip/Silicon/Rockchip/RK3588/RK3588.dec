@@ -81,6 +81,10 @@
   gRK3588TokenSpaceGuid.PcdBq25890I2cBus|0|UINT8|0x00010907
   gRK3588TokenSpaceGuid.PcdBq25890I2cAddress|0x6A|UINT8|0x00010908
   gRK3588TokenSpaceGuid.PcdTypecRoleDefault|0|UINT32|0x00010909
+  gRK3588TokenSpaceGuid.PcdBluetoothSupported|FALSE|BOOLEAN|0x00010A01
+  gRK3588TokenSpaceGuid.PcdBluetoothStateDefault|1|UINT32|0x00010A02
+  gRK3588TokenSpaceGuid.PcdWifiSupported|FALSE|BOOLEAN|0x00010A03
+  gRK3588TokenSpaceGuid.PcdWifiStateDefault|0|UINT32|0x00010A04
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectors|{ 0x0 }|UINT32[]|0x00010801 {
     <Packages>
@@ -161,6 +165,8 @@
   gRK3588TokenSpaceGuid.PcdBq25890ChargeCurrentMa|0|UINT32|0x00000907
   gRK3588TokenSpaceGuid.PcdBq25890ChargePowerMw|0|UINT32|0x00000908
   gRK3588TokenSpaceGuid.PcdBq25890VbusVoltageMv|0|UINT32|0x00000909
+  gRK3588TokenSpaceGuid.PcdBluetoothState|0|UINT32|0x00000A01
+  gRK3588TokenSpaceGuid.PcdWifiState|0|UINT32|0x00000A02
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|0|UINT32|0x00000801
   gRK3588TokenSpaceGuid.PcdDisplayModePreset|{ 0x0 }|DISPLAY_MODE_PRESET_VARSTORE_DATA|0x00000802 {

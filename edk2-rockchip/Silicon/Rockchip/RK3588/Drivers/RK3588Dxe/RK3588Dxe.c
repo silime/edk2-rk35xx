@@ -39,6 +39,7 @@
 #include "FanControl.h"
 #include "UsbDpPhy.h"
 #include "Typec.h"
+#include "DeviceConfig.h"
 #include "DebugSerialPort.h"
 #include "Display.h"
 
@@ -199,6 +200,7 @@ SetupVariables (
   SetupCoolingFanVariables ();
   SetupUsbDpPhyVariables ();
   SetupTypecVariables ();
+  SetupDeviceConfigVariables ();
   SetupDebugSerialPortVariables ();
   SetupDisplayVariables ();
 
@@ -247,6 +249,7 @@ ApplyVariables (
   ApplyConfigTableVariables ();
   ApplyCoolingFanVariables ();
   ApplyUsbDpPhyVariables ();
+  ApplyDeviceConfigVariables ();
   ApplyDebugSerialPortVariables ();
   ApplyDisplayVariables ();
 

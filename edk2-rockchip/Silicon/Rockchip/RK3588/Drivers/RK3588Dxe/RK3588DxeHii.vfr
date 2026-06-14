@@ -20,6 +20,7 @@
 #include "Display.h"
 #include "../../../Drivers/I2c/Cw2015Dxe/Cw2015Dxe.h"
 #include "../../../Drivers/I2c/Fusb302Dxe/Fusb302Dxe.h"
+#include "DeviceConfig.h"
 
 //
 // EFI Variable attributes
@@ -175,6 +176,16 @@ formset
       name  = TypecRole,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore DEVICE_STATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = BluetoothState,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore DEVICE_STATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = WifiState,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore PCIE30_STATE_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = Pcie30State,
@@ -296,16 +307,11 @@ formset
         prompt = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE),
         help = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_HELP);
 
-#if FixedPcdGetBool (PcdBatterySupported)
-      goto BATTERY_FORM_ID,
-        prompt = STRING_TOKEN(STR_BATTERY_FORM_TITLE),
-        help = STRING_TOKEN(STR_BATTERY_FORM_HELP);
-#endif
-
-#if FixedPcdGetBool (PcdTypecSupported)
-      goto TYPEC_FORM_ID,
-        prompt = STRING_TOKEN(STR_TYPEC_FORM_TITLE),
-        help = STRING_TOKEN(STR_TYPEC_FORM_HELP);
+#if FixedPcdGetBool (PcdBatterySupported) || FixedPcdGetBool (PcdTypecSupported) || \
+    FixedPcdGetBool (PcdBluetoothSupported) || FixedPcdGetBool (PcdWifiSupported)
+      goto 0x1010,
+        prompt = STRING_TOKEN(STR_DEVICE_CONFIG_FORM_TITLE),
+        help = STRING_TOKEN(STR_DEVICE_CONFIG_FORM_HELP);
 #endif
     endform;
 
@@ -963,6 +969,49 @@ formset
         subtitle text = STRING_TOKEN(STR_NULL_STRING);
         subtitle text = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_SUBTITLE);
     endform;
+
+#if FixedPcdGetBool (PcdBatterySupported) || FixedPcdGetBool (PcdTypecSupported) || \
+    FixedPcdGetBool (PcdBluetoothSupported) || FixedPcdGetBool (PcdWifiSupported)
+    form formid = 0x1010,
+        title = STRING_TOKEN(STR_DEVICE_CONFIG_FORM_TITLE);
+
+#if FixedPcdGetBool (PcdBluetoothSupported)
+        oneof varid = BluetoothState.State,
+          prompt      = STRING_TOKEN(STR_BLUETOOTH_STATE_PROMPT),
+          help        = STRING_TOKEN(STR_BLUETOOTH_STATE_HELP),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGet32 (PcdBluetoothStateDefault),
+          option text = STRING_TOKEN(STR_DISABLED), value = DEVICE_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = DEVICE_STATE_ENABLED, flags = 0;
+        endoneof;
+#endif
+
+#if FixedPcdGetBool (PcdWifiSupported)
+        oneof varid = WifiState.State,
+          prompt      = STRING_TOKEN(STR_WIFI_STATE_PROMPT),
+          help        = STRING_TOKEN(STR_WIFI_STATE_HELP),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGet32 (PcdWifiStateDefault),
+          option text = STRING_TOKEN(STR_DISABLED), value = DEVICE_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = DEVICE_STATE_ENABLED, flags = 0;
+        endoneof;
+#endif
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+#if FixedPcdGetBool (PcdBatterySupported)
+        goto BATTERY_FORM_ID,
+          prompt = STRING_TOKEN(STR_BATTERY_FORM_TITLE),
+          help = STRING_TOKEN(STR_BATTERY_FORM_HELP);
+#endif
+
+#if FixedPcdGetBool (PcdTypecSupported)
+        goto TYPEC_FORM_ID,
+          prompt = STRING_TOKEN(STR_TYPEC_FORM_TITLE),
+          help = STRING_TOKEN(STR_TYPEC_FORM_HELP);
+#endif
+    endform;
+#endif
 
 #if FixedPcdGetBool (PcdBatterySupported)
     form formid = BATTERY_FORM_ID,

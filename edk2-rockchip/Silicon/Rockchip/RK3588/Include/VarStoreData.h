@@ -118,6 +118,13 @@ typedef struct {
   UINT32    Role;
 } TYPEC_ROLE_VARSTORE_DATA;
 
+#define DEVICE_STATE_DISABLED  0
+#define DEVICE_STATE_ENABLED   1
+
+typedef struct {
+  UINT32    State;
+} DEVICE_STATE_VARSTORE_DATA;
+
 typedef struct {
   UINT64    Value;
 } DEBUG_SERIAL_PORT_BAUD_RATE_VARSTORE_DATA;
