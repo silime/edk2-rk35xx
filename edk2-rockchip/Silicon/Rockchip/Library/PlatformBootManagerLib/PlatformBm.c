@@ -413,6 +413,7 @@ PlatformRegisterFvBootOption (
   EFI_BOOT_MANAGER_LOAD_OPTION       NewOption;
   EFI_BOOT_MANAGER_LOAD_OPTION       *BootOptions;
   UINTN                              BootOptionCount;
+  UINTN                              BootOptionNumber;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
   EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
@@ -457,18 +458,22 @@ PlatformRegisterFvBootOption (
                   BootOptionCount
                   );
 
-  if (OptionIndex == -1) {
+  if (OptionIndex >= 0) {
+    BootOptionNumber = BootOptions[OptionIndex].OptionNumber;
+  } else {
     Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
     ASSERT_EFI_ERROR (Status);
-    Status = EfiBootManagerAddKeyOptionVariable (
-               NULL,
-               (UINT16)NewOption.OptionNumber,
-               0,
-               Key,
-               NULL
-               );
-    ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+    BootOptionNumber = NewOption.OptionNumber;
   }
+
+  Status = EfiBootManagerAddKeyOptionVariable (
+             NULL,
+             (UINT16)BootOptionNumber,
+             0,
+             Key,
+             NULL
+             );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
 
   EfiBootManagerFreeLoadOption (&NewOption);
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
@@ -747,6 +752,7 @@ PlatformRegisterOptionsAndKeys (
   EFI_INPUT_KEY                 Esc;
   EFI_INPUT_KEY                 F1;
   EFI_INPUT_KEY                 F4;
+  EFI_INPUT_KEY                 Up;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
 
   GetPlatformOptions ();
@@ -800,6 +806,9 @@ PlatformRegisterOptionsAndKeys (
   F4.ScanCode    = SCAN_F4;
   F4.UnicodeChar = CHAR_NULL;
   PlatformRegisterFvBootOption (&gRockchipMaskromResetFileGuid, L"Reset to MaskROM", 0, &F4);
+  Up.ScanCode    = SCAN_UP;
+  Up.UnicodeChar = CHAR_NULL;
+  PlatformRegisterFvBootOption (&gRockchipMaskromResetFileGuid, L"Reset to MaskROM", 0, &Up);
 }
 
 //

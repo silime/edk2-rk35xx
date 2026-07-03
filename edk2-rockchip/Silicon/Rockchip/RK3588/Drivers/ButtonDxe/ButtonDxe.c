@@ -9,16 +9,19 @@
 #include <Guid/ConsoleInDevice.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleTextIn.h>
+#include <Protocol/SimpleTextInEx.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/RK806.h>
 #include <Library/SaradcLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #define BUTTON_POLL_INTERVAL  500000
 #define BUTTON_QUEUE_SIZE     8
 #define BUTTON_ADC_LOG_DELTA     20
+#define BUTTON_NOTIFY_COUNT       16
 
 typedef struct {
   VENDOR_DEVICE_PATH          Vendor;
@@ -26,7 +29,14 @@ typedef struct {
 } BUTTON_DEVICE_PATH;
 
 typedef struct {
+  BOOLEAN                      InUse;
+  EFI_KEY_DATA                 KeyData;
+  EFI_KEY_NOTIFY_FUNCTION      Callback;
+} BUTTON_KEY_NOTIFY;
+
+typedef struct {
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL    SimpleTextIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleTextInEx;
   EFI_HANDLE                        Handle;
   EFI_EVENT                         PollEvent;
   EFI_INPUT_KEY                     Queue[BUTTON_QUEUE_SIZE];
@@ -34,6 +44,7 @@ typedef struct {
   UINTN                             QueueTail;
   SARADC_KEY                        LastSaradcKey;
   UINT32                            LastAdcData;
+  BUTTON_KEY_NOTIFY                 Notify[BUTTON_NOTIFY_COUNT];
 } BUTTON_DEVICE;
 
 STATIC BUTTON_DEVICE  mButtonDevice;
@@ -71,6 +82,70 @@ ButtonQueueIsEmpty (
 
 STATIC
 VOID
+ButtonFillKeyData (
+  OUT EFI_KEY_DATA  *KeyData,
+  IN  UINT16        ScanCode,
+  IN  CHAR16        UnicodeChar
+  )
+{
+  ZeroMem (KeyData, sizeof (*KeyData));
+  KeyData->Key.ScanCode                 = ScanCode;
+  KeyData->Key.UnicodeChar              = UnicodeChar;
+  KeyData->KeyState.KeyShiftState       = EFI_SHIFT_STATE_VALID;
+  KeyData->KeyState.KeyToggleState      = EFI_TOGGLE_STATE_VALID;
+}
+
+STATIC
+BOOLEAN
+ButtonKeyMatches (
+  IN CONST EFI_KEY_DATA  *RegisteredKey,
+  IN CONST EFI_KEY_DATA  *PressedKey
+  )
+{
+  if ((RegisteredKey->Key.ScanCode != PressedKey->Key.ScanCode) ||
+      (RegisteredKey->Key.UnicodeChar != PressedKey->Key.UnicodeChar))
+  {
+    return FALSE;
+  }
+
+  if (((RegisteredKey->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
+      (RegisteredKey->KeyState.KeyShiftState != PressedKey->KeyState.KeyShiftState))
+  {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+STATIC
+VOID
+ButtonNotifyKey (
+  IN UINT16  ScanCode,
+  IN CHAR16  UnicodeChar
+  )
+{
+  EFI_KEY_DATA  KeyData;
+  UINTN         Index;
+
+  ButtonFillKeyData (&KeyData, ScanCode, UnicodeChar);
+
+  for (Index = 0; Index < BUTTON_NOTIFY_COUNT; Index++) {
+    if (mButtonDevice.Notify[Index].InUse &&
+        ButtonKeyMatches (&mButtonDevice.Notify[Index].KeyData, &KeyData))
+    {
+      DEBUG ((
+        DEBUG_INFO,
+        "ButtonDxe: notify ScanCode=0x%x UnicodeChar=0x%x\n",
+        ScanCode,
+        UnicodeChar
+        ));
+      mButtonDevice.Notify[Index].Callback (&KeyData);
+    }
+  }
+}
+
+STATIC
+VOID
 ButtonQueueAdd (
   IN UINT16  ScanCode,
   IN CHAR16  UnicodeChar
@@ -94,6 +169,8 @@ ButtonQueueAdd (
     ScanCode,
     UnicodeChar
     ));
+
+  ButtonNotifyKey (ScanCode, UnicodeChar);
 }
 
 STATIC
@@ -142,12 +219,12 @@ ButtonPoll (
       mButtonDevice.LastSaradcKey,
       SaradcKey,
       AdcData
-      ));
+    ));
 
     if (SaradcKey == SaradcKeyVolumeUp) {
-      ButtonQueueAdd (SCAN_DOWN, CHAR_NULL);
-    } else if (SaradcKey == SaradcKeyVolumeDown) {
       ButtonQueueAdd (SCAN_UP, CHAR_NULL);
+    } else if (SaradcKey == SaradcKeyVolumeDown) {
+      ButtonQueueAdd (SCAN_DOWN, CHAR_NULL);
     }
 
     mButtonDevice.LastSaradcKey = SaradcKey;
@@ -226,6 +303,127 @@ ButtonReadKeyStroke (
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_STATUS
+EFIAPI
+ButtonResetEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN BOOLEAN                            ExtendedVerification
+  )
+{
+  return ButtonReset (&mButtonDevice.SimpleTextIn, ExtendedVerification);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ButtonReadKeyStrokeEx (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  OUT EFI_KEY_DATA                      *KeyData
+  )
+{
+  EFI_INPUT_KEY  Key;
+  EFI_STATUS     Status;
+
+  if (KeyData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ButtonReadKeyStroke (&mButtonDevice.SimpleTextIn, &Key);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ButtonFillKeyData (KeyData, Key.ScanCode, Key.UnicodeChar);
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ButtonSetState (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
+  )
+{
+  if (KeyToggleState == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_UNSUPPORTED;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ButtonRegisterKeyNotify (
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN  EFI_KEY_DATA                       *KeyData,
+  IN  EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
+  OUT VOID                               **NotifyHandle
+  )
+{
+  UINTN  Index;
+
+  if ((KeyData == NULL) || (KeyNotificationFunction == NULL) || (NotifyHandle == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < BUTTON_NOTIFY_COUNT; Index++) {
+    if (mButtonDevice.Notify[Index].InUse &&
+        ButtonKeyMatches (&mButtonDevice.Notify[Index].KeyData, KeyData) &&
+        (mButtonDevice.Notify[Index].Callback == KeyNotificationFunction))
+    {
+      *NotifyHandle = &mButtonDevice.Notify[Index];
+      return EFI_SUCCESS;
+    }
+  }
+
+  for (Index = 0; Index < BUTTON_NOTIFY_COUNT; Index++) {
+    if (!mButtonDevice.Notify[Index].InUse) {
+      CopyMem (&mButtonDevice.Notify[Index].KeyData, KeyData, sizeof (*KeyData));
+      mButtonDevice.Notify[Index].Callback = KeyNotificationFunction;
+      mButtonDevice.Notify[Index].InUse    = TRUE;
+      *NotifyHandle                        = &mButtonDevice.Notify[Index];
+
+      DEBUG ((
+        DEBUG_INFO,
+        "ButtonDxe: registered notify ScanCode=0x%x UnicodeChar=0x%x Shift=0x%x\n",
+        KeyData->Key.ScanCode,
+        KeyData->Key.UnicodeChar,
+        KeyData->KeyState.KeyShiftState
+        ));
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_OUT_OF_RESOURCES;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ButtonUnregisterKeyNotify (
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  IN VOID                               *NotificationHandle
+  )
+{
+  UINTN  Index;
+
+  if (NotificationHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < BUTTON_NOTIFY_COUNT; Index++) {
+    if (&mButtonDevice.Notify[Index] == NotificationHandle) {
+      ZeroMem (&mButtonDevice.Notify[Index], sizeof (mButtonDevice.Notify[Index]));
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_INVALID_PARAMETER;
+}
+
 EFI_STATUS
 EFIAPI
 ButtonDxeEntryPoint (
@@ -252,6 +450,11 @@ ButtonDxeEntryPoint (
 
   mButtonDevice.SimpleTextIn.Reset         = ButtonReset;
   mButtonDevice.SimpleTextIn.ReadKeyStroke = ButtonReadKeyStroke;
+  mButtonDevice.SimpleTextInEx.Reset               = ButtonResetEx;
+  mButtonDevice.SimpleTextInEx.ReadKeyStrokeEx     = ButtonReadKeyStrokeEx;
+  mButtonDevice.SimpleTextInEx.SetState            = ButtonSetState;
+  mButtonDevice.SimpleTextInEx.RegisterKeyNotify   = ButtonRegisterKeyNotify;
+  mButtonDevice.SimpleTextInEx.UnregisterKeyNotify = ButtonUnregisterKeyNotify;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -262,6 +465,17 @@ ButtonDxeEntryPoint (
                   );
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
+                  ButtonWaitForKey,
+                  NULL,
+                  &mButtonDevice.SimpleTextInEx.WaitForKeyEx
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Error;
   }
 
   Status = gBS->CreateEvent (
@@ -284,12 +498,20 @@ ButtonDxeEntryPoint (
     goto Error;
   }
 
+  EfiBootManagerUpdateConsoleVariable (
+    ConIn,
+    (EFI_DEVICE_PATH_PROTOCOL *)&mButtonDevicePath,
+    NULL
+    );
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mButtonDevice.Handle,
                   &gEfiDevicePathProtocolGuid,
                   &mButtonDevicePath,
                   &gEfiSimpleTextInProtocolGuid,
                   &mButtonDevice.SimpleTextIn,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &mButtonDevice.SimpleTextInEx,
                   &gEfiConsoleInDeviceGuid,
                   NULL,
                   NULL
@@ -303,6 +525,10 @@ Error:
   DEBUG ((DEBUG_ERROR, "ButtonDxe: initialization failed: %r\n", Status));
   if (mButtonDevice.PollEvent != NULL) {
     gBS->CloseEvent (mButtonDevice.PollEvent);
+  }
+
+  if (mButtonDevice.SimpleTextInEx.WaitForKeyEx != NULL) {
+    gBS->CloseEvent (mButtonDevice.SimpleTextInEx.WaitForKeyEx);
   }
 
   gBS->CloseEvent (mButtonDevice.SimpleTextIn.WaitForKey);

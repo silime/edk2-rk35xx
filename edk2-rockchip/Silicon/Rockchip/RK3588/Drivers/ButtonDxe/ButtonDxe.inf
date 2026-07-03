@@ -26,12 +26,14 @@
   DebugLib
   RK806
   SaradcLib
+  UefiBootManagerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiSimpleTextInProtocolGuid
+  gEfiSimpleTextInputExProtocolGuid
   gRockchipPlatformConfigAppliedProtocolGuid  ## CONSUMES
 
 [Guids]
