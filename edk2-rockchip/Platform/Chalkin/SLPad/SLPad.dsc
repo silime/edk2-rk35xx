@@ -37,6 +37,10 @@
   DEFINE RK_RTC8563_ENABLE = TRUE
   DEFINE RK_I2C_DEMO_ENABLE = TRUE
 
+  DEFINE TYPEC_ROLE_DUAL       = 0
+  DEFINE DEVICE_STATE_DISABLED = 0
+  DEFINE DEVICE_STATE_ENABLED  = 1
+
   #
   # RK3588-based platform
   #
@@ -66,8 +70,8 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-slpad-switch"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x51, 0x62, 0x6a, 0x22, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x6, 0x6, 0x6, 0x6, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x38, 0x6a, 0x51, 0x62, 0x6a, 0x22, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x3, 0x4, 0x6, 0x6, 0x6, 0x6, 0x7 }
   gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE }
   gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x38, 0x51, 0x11 }
   gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x3, 0x6, 0x7 }
@@ -137,7 +141,7 @@
   $(PLATFORM_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
 
   # Power and volume buttons
-  Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/ButtonDxe/ButtonDxe.inf
+  Silicon/Rockchip/RK3588/Drivers/ButtonDxe/ButtonDxe.inf
   Silicon/Rockchip/Drivers/I2c/Cw2015Dxe/Cw2015Dxe.inf
   Silicon/Rockchip/Drivers/I2c/Bq25890Dxe/Bq25890Dxe.inf
   Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf

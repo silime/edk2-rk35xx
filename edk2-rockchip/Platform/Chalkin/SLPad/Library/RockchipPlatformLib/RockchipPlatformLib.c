@@ -7,14 +7,21 @@
  **/
 #include <Base.h>
 #include <Library/DebugLib.h>
+#include <Library/CruLib.h>
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
+#include <Library/PcdLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
 #include <Library/TimerLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+
+STATIC EFI_GUID  mRK3588DxeFormSetGuid = {
+  0x10f41c33, 0xa468, 0x42cd, { 0x85, 0xee, 0x70, 0x43, 0x21, 0x3f, 0x73, 0xa3 }
+};
 
 static struct regulator_init_data rk806_init_data[] = {
     /* Master PMIC */
@@ -268,6 +275,191 @@ HdmiTxIomux(
   }
 }
 
+STATIC
+VOID
+SetupStateVariable (
+  IN CHAR16   *Name,
+  IN UINT32   DefaultState,
+  IN UINTN    TokenNumber
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      State;
+  UINTN       Size;
+
+  Size   = sizeof (State);
+  Status = gRT->GetVariable (
+                  Name,
+                  &mRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &State
+                  );
+  if (EFI_ERROR (Status) || (State > DEVICE_STATE_ENABLED)) {
+    State  = DefaultState;
+    Status = gRT->SetVariable (
+                    Name,
+                    &mRK3588DxeFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    sizeof (State),
+                    &State
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = LibPcdSet32S (TokenNumber, State);
+  ASSERT_EFI_ERROR (Status);
+}
+
+VOID
+EFIAPI
+SetupDeviceConfigVariables (
+  VOID
+  )
+{
+  SetupStateVariable (
+    L"BluetoothState",
+    FixedPcdGet32 (PcdBluetoothStateDefault),
+    _PCD_TOKEN_PcdBluetoothState
+    );
+  SetupStateVariable (
+    L"WifiState",
+    FixedPcdGet32 (PcdWifiStateDefault),
+    _PCD_TOKEN_PcdWifiState
+    );
+}
+
+STATIC
+VOID
+ConfigureBluetoothInterface (
+  VOID
+  )
+{
+  HAL_CRU_ClkEnable (PCLK_UART9_GATE);
+  HAL_CRU_ClkEnable (SCLK_UART9_GATE);
+  HAL_CRU_RstDeassert (SRST_P_UART9);
+  HAL_CRU_RstDeassert (SRST_S_UART9);
+
+  GpioPinSetFunction (2, GPIO_PIN_PC4, 10); // uart9_rx_m0
+  GpioPinSetPull (2, GPIO_PIN_PC4, GPIO_PIN_PULL_UP);
+  GpioPinSetFunction (2, GPIO_PIN_PC2, 10); // uart9_tx_m0
+  GpioPinSetPull (2, GPIO_PIN_PC2, GPIO_PIN_PULL_UP);
+  GpioPinSetFunction (4, GPIO_PIN_PC5, 10); // uart9m0_ctsn
+  GpioPinSetPull (4, GPIO_PIN_PC5, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (4, GPIO_PIN_PC4, 10); // uart9m0_rtsn
+  GpioPinSetPull (4, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
+
+  GpioPinSetFunction (0, GPIO_PIN_PC5, 0);
+  GpioPinSetPull (0, GPIO_PIN_PC5, GPIO_PIN_PULL_UP);
+  GpioPinWrite (0, GPIO_PIN_PC5, FALSE);
+  GpioPinSetDirection (0, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
+
+  GpioPinSetFunction (0, GPIO_PIN_PA0, 0);
+  GpioPinSetPull (0, GPIO_PIN_PA0, GPIO_PIN_PULL_DOWN);
+  GpioPinSetDirection (0, GPIO_PIN_PA0, GPIO_PIN_INPUT);
+}
+
+STATIC
+VOID
+ApplyBluetoothPowerState (
+  IN BOOLEAN  Enable
+  )
+{
+  GpioPinSetFunction (0, GPIO_PIN_PC6, 0);
+  GpioPinSetPull (0, GPIO_PIN_PC6, GPIO_PIN_PULL_NONE);
+  GpioPinWrite (0, GPIO_PIN_PC6, FALSE);
+  GpioPinSetDirection (0, GPIO_PIN_PC6, GPIO_PIN_OUTPUT);
+
+  GpioPinSetFunction (4, GPIO_PIN_PC4, 0);
+  GpioPinSetPull (4, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
+  GpioPinSetDirection (4, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+
+  GpioPinWrite (4, GPIO_PIN_PC4, FALSE);
+  MicroSecondDelay (100 * 1000);
+  GpioPinWrite (4, GPIO_PIN_PC4, TRUE);
+  MicroSecondDelay (10 * 1000);
+
+  GpioPinSetFunction (4, GPIO_PIN_PC4, 10);
+  GpioPinSetPull (4, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
+
+  if (!Enable) {
+    return;
+  }
+
+  MicroSecondDelay (10 * 1000);
+  GpioPinWrite (0, GPIO_PIN_PC6, TRUE);
+  MicroSecondDelay (100 * 1000);
+}
+
+STATIC
+VOID
+ConfigureWifiInterface (
+  VOID
+  )
+{
+  HAL_CRU_ClkEnable (HCLK_SDIO_ROOT_GATE);
+  HAL_CRU_ClkEnable (HCLK_SDIO_NIU_GATE);
+  HAL_CRU_ClkEnable (HCLK_SDIO_GATE);
+  HAL_CRU_ClkEnable (CCLK_SRC_SDIO_GATE);
+  HAL_CRU_ClkSetFreq (CCLK_SRC_SDIO, 150000000);
+  HAL_CRU_RstDeassert (SRST_H_SDIO_NIU);
+  HAL_CRU_RstDeassert (SRST_H_SDIO);
+  HAL_CRU_RstDeassert (SRST_SDIO);
+
+  GpioPinSetFunction (2, GPIO_PIN_PB3, 2); // sdio_clk_m0
+  GpioPinSetPull (2, GPIO_PIN_PB3, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (2, GPIO_PIN_PB2, 2); // sdio_cmd_m0
+  GpioPinSetPull (2, GPIO_PIN_PB2, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (2, GPIO_PIN_PA6, 2); // sdio_d0_m0
+  GpioPinSetPull (2, GPIO_PIN_PA6, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (2, GPIO_PIN_PA7, 2); // sdio_d1_m0
+  GpioPinSetPull (2, GPIO_PIN_PA7, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (2, GPIO_PIN_PB0, 2); // sdio_d2_m0
+  GpioPinSetPull (2, GPIO_PIN_PB0, GPIO_PIN_PULL_NONE);
+  GpioPinSetFunction (2, GPIO_PIN_PB1, 2); // sdio_d3_m0
+  GpioPinSetPull (2, GPIO_PIN_PB1, GPIO_PIN_PULL_NONE);
+
+  GpioPinSetFunction (0, GPIO_PIN_PB7, 0);
+  GpioPinSetPull (0, GPIO_PIN_PB7, GPIO_PIN_PULL_DOWN);
+  GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_INPUT);
+}
+
+STATIC
+VOID
+ApplyWifiPowerState (
+  IN BOOLEAN  Enable
+  )
+{
+  GpioPinSetFunction (0, GPIO_PIN_PC4, 0);
+  GpioPinSetPull (0, GPIO_PIN_PC4, GPIO_PIN_PULL_UP);
+  GpioPinWrite (0, GPIO_PIN_PC4, FALSE);
+  GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+
+  if (!Enable) {
+    return;
+  }
+
+  GpioPinWrite (0, GPIO_PIN_PC4, TRUE);
+  MicroSecondDelay (200 * 1000);
+}
+
+VOID
+EFIAPI
+ApplyDeviceConfigVariables (
+  VOID
+  )
+{
+  if (FixedPcdGetBool (PcdBluetoothSupported)) {
+    ConfigureBluetoothInterface ();
+    ApplyBluetoothPowerState (PcdGet32 (PcdBluetoothState) == DEVICE_STATE_ENABLED);
+  }
+
+  if (FixedPcdGetBool (PcdWifiSupported)) {
+    ConfigureWifiInterface ();
+    ApplyWifiPowerState (PcdGet32 (PcdWifiState) == DEVICE_STATE_ENABLED);
+  }
+}
+
 PWM_DATA pwm_data = {
     .ControllerID = PWM_CONTROLLER3,
     .ChannelID = PWM_CHANNEL2,
@@ -347,6 +539,10 @@ PlatformEarlyInit(
   GpioPinSetFunction (4, GPIO_PIN_PB1, 0);
   GpioPinWrite (4, GPIO_PIN_PB1, FALSE);
   GpioPinSetDirection (4, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
+  /* touchscreen int: GPIO1_D2, pull up, input */
+  GpioPinSetFunction (1, GPIO_PIN_PD2, 0);
+  GpioPinSetPull (1, GPIO_PIN_PD2, GPIO_PIN_PULL_NONE);
+  GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_INPUT);
 
   /* touchscreen reset */
   GpioPinSetFunction (1, GPIO_PIN_PD3, 0);
@@ -355,6 +551,16 @@ PlatformEarlyInit(
   MicroSecondDelay (10 * 1000);
   GpioPinWrite (1, GPIO_PIN_PD3, TRUE);
   MicroSecondDelay (200 * 1000);
+
+  /* lsm6ds3tr-c 
+    interrupt-parent = <&gpio4>;
+		interrupts = <RK_PC2 IRQ_TYPE_LEVEL_HIGH>;
+    rockchip,pins = <4 RK_PC2 RK_FUNC_GPIO &pcfg_pull_none>;
+  */
+  GpioPinSetFunction (4, GPIO_PIN_PC2, 0);
+  GpioPinSetPull (4, GPIO_PIN_PC2, GPIO_PIN_PULL_NONE);
+  GpioPinSetDirection (4, GPIO_PIN_PC2, GPIO_PIN_INPUT);
+  
 
   /* spk-con-gpio */
   GpioPinWrite (4, GPIO_PIN_PA0, TRUE);

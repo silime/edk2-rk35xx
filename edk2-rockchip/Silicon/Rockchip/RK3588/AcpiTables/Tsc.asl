@@ -17,10 +17,21 @@
         I2cSerialBusV2(BOARD_TOUCH_I2C_ADDR, ControllerInitiated, 0x000186A0,
           AddressingMode7Bit, BOARD_TOUCH_I2C,
           0x00, ResourceConsumer, , Exclusive)
-        GpioInt (Edge, ActiveHigh, Exclusive, PullNone, 0x0000,
+        GpioInt (Edge, ActiveLow, Exclusive, PullNone, 0x0000,
           BOARD_TOUCH_INT_GPIO, 0x00, ResourceConsumer)
           {
             BOARD_TOUCH_INT_GPIO_PIN
+          }
+        // GpioIo (Exclusive, PullUp, 0x0000, 0x0000, IoRestrictionNone,
+        //   BOARD_TOUCH_INT_GPIO, 0x00, ResourceConsumer, ,) 
+        //   { 
+        //     BOARD_TOUCH_INT_GPIO_PIN 
+        //   }
+
+        GpioIo (Exclusive, PullUp, 0x0000, 0x0000, IoRestrictionNone,
+          BOARD_TOUCH_RST_GPIO, 0x00, ResourceConsumer, ,) 
+          { 
+            BOARD_TOUCH_RST_GPIO_PIN 
           }
         // GpioIo (Exclusive, PullNone, 0x0000, 0x0000, IoRestrictionNone,
         //   BOARD_TOUCH_RST_GPIO, 0x00, ResourceConsumer, ,
