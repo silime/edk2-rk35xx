@@ -481,6 +481,14 @@ Bq25890Start (
     Bq25890Refresh (Context->RefreshEvent, Context);
     Status = gBS->SetTimer (Context->RefreshEvent, TimerPeriodic, BQ25890_POLL_INTERVAL_MS * 10 * 1000);
   }
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Controller,
+                    &gBq25890ControlProtocolGuid,
+                    &mBq25890ControlProtocol,
+                    NULL
+                    );
+  }
   if (EFI_ERROR (Status)) {
     if (mBq25890Context == Context) {
       mBq25890Context = NULL;
@@ -526,8 +534,6 @@ Bq25890DxeInitialize (
                 &ImageHandle,
                 &gEfiDriverBindingProtocolGuid,
                 &mDriverBinding,
-                &gBq25890ControlProtocolGuid,
-                &mBq25890ControlProtocol,
                 NULL
                 );
 }
