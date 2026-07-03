@@ -124,12 +124,8 @@ AcpiDsdtFixupStatus (
     { "\\_SB.ATA0._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA },
     { "\\_SB.ATA1._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA },
     { "\\_SB.ATA2._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA },
-    { "\\_SB.UAR9._STA", !FixedPcdGetBool (PcdBluetoothSupported) ||
-      PcdGet32 (PcdBluetoothState) == DEVICE_STATE_ENABLED },
     { "\\_SB.BTH0._STA", !FixedPcdGetBool (PcdBluetoothSupported) ||
       PcdGet32 (PcdBluetoothState) == DEVICE_STATE_ENABLED },
-    { "\\_SB.SDIO._STA", !FixedPcdGetBool (PcdWifiSupported) ||
-      PcdGet32 (PcdWifiState) == DEVICE_STATE_ENABLED },
     { "\\_SB.SDIO.WLN0._STA", !FixedPcdGetBool (PcdWifiSupported) ||
       PcdGet32 (PcdWifiState) == DEVICE_STATE_ENABLED },
   };

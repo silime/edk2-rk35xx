@@ -26,6 +26,7 @@
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
+#include <Library/RockchipPlatformLib.h>
 #include <VarStoreData.h>
 #include <Soc.h>
 #include <RK3588RegsPeri.h>
@@ -39,7 +40,6 @@
 #include "FanControl.h"
 #include "UsbDpPhy.h"
 #include "Typec.h"
-#include "DeviceConfig.h"
 #include "DebugSerialPort.h"
 #include "Display.h"
 

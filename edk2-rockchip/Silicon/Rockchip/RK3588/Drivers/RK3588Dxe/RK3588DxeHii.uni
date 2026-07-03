@@ -331,16 +331,13 @@
 #string STR_TYPEC_ROLE_DUAL                                #language en-US "Dual Role"
 #string STR_TYPEC_ROLE_SINK                                #language en-US "Sink"
 #string STR_TYPEC_ROLE_SOURCE                              #language en-US "Source"
-
 /*
- * Device configuration
+ * Device state configuration
  */
-#string STR_DEVICE_CONFIG_FORM_TITLE                       #language en-US "Device Configuration"
-#string STR_DEVICE_CONFIG_FORM_HELP                        #language en-US "Configure on-board devices and view device status."
 #string STR_BLUETOOTH_STATE_PROMPT                         #language en-US "Bluetooth"
-#string STR_BLUETOOTH_STATE_HELP                           #language en-US "Enable Bluetooth power, UART9 pins and ACPI devices after reboot."
-#string STR_WIFI_STATE_PROMPT                              #language en-US "WiFi (Bring-up)"
-#string STR_WIFI_STATE_HELP                                #language en-US "Enable WiFi SDIO pins, power sequence and ACPI devices after reboot. Disabled by default while bring-up is incomplete."
+#string STR_BLUETOOTH_STATE_HELP                           #language en-US "Enable Bluetooth module power and expose the Bluetooth device"
+#string STR_WIFI_STATE_PROMPT                              #language en-US "WiFi"
+#string STR_WIFI_STATE_HELP                                #language en-US "Enable WiFi"
 #string STR_DEBUG_SERIAL_PORT_SUBTITLE                     #language en-US "Note: These settings only take effect in UEFI and might be overridden by the OS. Earlier boot messages will be printed at the default settings."
 
 #string STR_DEBUG_SERIAL_PORT_BAUD_RATE_PROMPT             #language en-US "Baud Rate"

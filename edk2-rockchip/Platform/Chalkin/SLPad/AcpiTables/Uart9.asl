@@ -7,7 +7,8 @@
  **/
 
 Device (UAR9) {
-  Name (_HID, "RKCP3009")
+  Name (_HID, "RKCP3008")
+  Name (_CID, "HISI0031")
   Name (_UID, 9)
   Name (_CCA, 0)
 
@@ -61,13 +62,24 @@ Device (BTH0) {
       ResourceConsumer,
       BTUR
     )
-    GpioIo (Exclusive, PullUp, 0x0000, 0x0000, IoRestrictionOutputOnly,
+    // BT_WAKE: host drives the controller wake input. Use IoRestrictionNone
+    // so diagnostics can read back the output latch through GPIO class.
+    GpioIo (Exclusive, PullUp, 0x0000, 0x0000, IoRestrictionNone,
       "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
       { GPIO_PIN_PC5 }
-    GpioIo (Exclusive, PullNone, 0x0000, 0x0000, IoRestrictionOutputOnly,
+    // REG_ON: host drives controller power/reset. Use IoRestrictionNone so
+    // the driver can confirm the latched output state during fault logging.
+    GpioIo (Exclusive, PullNone, 0x0000, 0x0000, IoRestrictionNone,
       "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
       { GPIO_PIN_PC6 }
-    GpioInt (Edge, ActiveLow, ExclusiveAndWake, PullDown, 0x0000,
+    // HOST_WAKE diagnostic input. The transport driver treats the third
+    // GPIO_IO resource as optional HOST_WAKE readback.
+    GpioIo (Shared, PullDown, 0x0000, 0x0000, IoRestrictionInputOnly,
+      "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
+      { GPIO_PIN_PA0 }
+    // HOST_WAKE interrupt. SharedAndWake allows the diagnostic GPIO_IO above
+    // to reference the same pin while preserving wake capability.
+    GpioInt (Edge, ActiveHigh, SharedAndWake, PullDown, 0x0000,
       "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
       { GPIO_PIN_PA0 }
   })

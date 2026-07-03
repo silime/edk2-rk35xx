@@ -25,7 +25,6 @@
   FanControl.c
   UsbDpPhy.c
   Typec.c
-  DeviceConfig.c
   DebugSerialPort.c
   Display.c
 

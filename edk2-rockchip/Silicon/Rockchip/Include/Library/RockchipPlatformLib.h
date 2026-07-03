@@ -154,4 +154,16 @@ PlatformEarlyInit (
   VOID
   );
 
+VOID
+EFIAPI
+SetupDeviceConfigVariables (
+  VOID
+  );
+
+VOID
+EFIAPI
+ApplyDeviceConfigVariables (
+  VOID
+  );
+
 #endif
