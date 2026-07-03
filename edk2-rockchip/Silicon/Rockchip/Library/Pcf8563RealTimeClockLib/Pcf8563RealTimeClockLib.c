@@ -18,6 +18,7 @@
 
 #define SLAVE_ADDRESS            (FixedPcdGet8 (PcdI2cSlaveAddress))
 #define PCF8563_DATA_REG_OFFSET  0x2
+#define PCF8563_CLKOUT_REG_OFFSET  0x0D
 
 #define PCF8563_CLOCK_INVALID  0x80
 #define PCF8563_SECONDS_MASK   0x7f
@@ -27,6 +28,8 @@
 #define PCF8563_WEEKDAYS_MASK  0x07
 #define PCF8563_MONTHS_MASK    0x1f
 #define PCF8563_CENTURY_MASK   0x80
+#define PCF8563_CLKOUT_ENABLE  BIT7
+#define PCF8563_CLKOUT_32768HZ  0x00
 
 //
 // The PCF8563 has a 'century' flag, which means it could theoretically span
@@ -56,6 +59,11 @@ typedef struct {
   UINT8           Reg;
   RTC_DATETIME    DateTime;
 } RTC_SET_DATETIME_PACKET;
+
+typedef struct {
+  UINT8    Reg;
+  UINT8    Value;
+} RTC_SET_REGISTER_PACKET;
 #pragma pack()
 
 typedef struct {
@@ -65,6 +73,56 @@ typedef struct {
 } RTC_GET_I2C_REQUEST;
 
 typedef EFI_I2C_REQUEST_PACKET RTC_SET_I2C_REQUEST;
+
+STATIC
+EFI_STATUS
+Pcf8563WriteRegister (
+  IN EFI_I2C_MASTER_PROTOCOL  *I2cMaster,
+  IN UINT8                    Register,
+  IN UINT8                    Value
+  )
+{
+  RTC_SET_I2C_REQUEST      Op;
+  RTC_SET_REGISTER_PACKET  Packet;
+
+  Packet.Reg   = Register;
+  Packet.Value = Value;
+
+  Op.OperationCount             = 1;
+  Op.Operation[0].Flags         = 0;
+  Op.Operation[0].LengthInBytes = sizeof (Packet);
+  Op.Operation[0].Buffer        = (VOID *)&Packet;
+
+  return I2cMaster->StartRequest (
+                      I2cMaster,
+                      SLAVE_ADDRESS,
+                      (VOID *)&Op,
+                      NULL,
+                      NULL
+                      );
+}
+
+STATIC
+VOID
+Pcf8563EnableClkOut (
+  IN EFI_I2C_MASTER_PROTOCOL  *I2cMaster
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // PCF8563 CLKOUT register: FE=1 enables output, F=0 selects 32.768 kHz.
+  // The board uses this physical clock for WiFi/Bluetooth LPO.
+  //
+  Status = Pcf8563WriteRegister (
+             I2cMaster,
+             PCF8563_CLKOUT_REG_OFFSET,
+             PCF8563_CLKOUT_ENABLE | PCF8563_CLKOUT_32768HZ
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: failed to enable 32.768 kHz CLKOUT - %r\n", __func__, Status));
+  }
+}
 
 /**
   Returns the current time and date information, and the time-keeping
@@ -354,6 +412,8 @@ I2cMasterRegistrationEvent (
         ));
       break;
     }
+
+    Pcf8563EnableClkOut (I2cMaster);
 
     mI2cMaster = I2cMaster;
     break;
