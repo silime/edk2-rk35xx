@@ -45,14 +45,29 @@ Device (SDIO) {
   })
 
   Device (WLN0) {
-    Name (_ADR, 1)
+    // SDIO _ADR: high word = slot 0, low word = function 1.
+    // This lets Windows merge these sideband resources into the FN1 PDO.
+    Name (_ADR, 0x00000001)
     Name (_UID, 0)
     Name (_CCA, 0)
     Name (_STA, 0x0F)
-    Name (_DEP, Package () { \_SB.GPI0, \_SB.SDIO })
+    Name (_RMV, 0)
+    Name (_DEP, Package () { \_SB.GPI0 })
 
     Name (_CRS, ResourceTemplate () {
-      GpioInt (Level, ActiveHigh, ExclusiveAndWake, PullDown, 0x0000,
+      // WL_REG_ON is a power-enable output. It must never be used as IRQ.
+      // DTS: gpio_wl_reg_on = <&gpio0 RK_PC4 GPIO_ACTIVE_HIGH>.
+      // Rockchip bank-local numbering is A0..A7=0..7, B0..B7=8..15, C0..C7=16..23.
+      GpioIo (Exclusive, PullNone, 0x0000, 0x0000, IoRestrictionOutputOnly,
+        "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
+        { GPIO_PIN_PC4 }
+
+      // OOB host-wake interrupt used by CONFIG_BCMDHD_OOB_INTR=y.
+      // DTS: gpio_wl_host_wake = <&gpio0 RK_PB7 GPIO_ACTIVE_HIGH>.
+      // Windows cannot mask this GPIO at DIRQL while the SDIO worker drains the
+      // level source. Detect the active-high transition and retain polling as a
+      // missed-edge watchdog.
+      GpioInt (Edge, ActiveHigh, ExclusiveAndWake, PullDown, 0x0000,
         "\\_SB.GPI0", 0x00, ResourceConsumer, ,)
         { GPIO_PIN_PB7 }
     })
@@ -60,8 +75,11 @@ Device (SDIO) {
     Name (_DSD, Package () {
       ToUUID ("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
-        Package () { "compatible", "brcm,bcm4329-fmac" },
+        Package () { "compatible", Package () { "android,bcmdhd_wlan", "brcm,bcm4329-fmac" } },
         Package () { "wifi-chip-type", "ap6398sv" },
+        Package () { "interrupt-names", "host-wake" },
+        Package () { "gpio_wl_reg_on", Package () { ^WLN0, 0, 0, 0 } },
+        Package () { "gpio_wl_host_wake", Package () { ^WLN0, 1, 0, 0 } },
       }
     })
   }

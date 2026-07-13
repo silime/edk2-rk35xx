@@ -8,10 +8,10 @@ Device(IMU0)
     {
         Name(RBUF, ResourceTemplate()
         {          
-            I2cSerialBusV2(0x6A, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C4", 0, ResourceConsumer) 
-            GpioInt(Edge, ActiveHigh, Exclusive, PullNone, 0, "\\_SB.GPI4") 
+            I2CSerialBus(0x6A, ControllerInitiated, 400000, AddressingMode7Bit, "\\_SB.I2C3", 0, ResourceConsumer) 
+            GpioInt(Edge, ActiveHigh, Exclusive, PullDown, 0, "\\_SB.GPO2") 
             {
-                GPIO_PIN_PC2
+                0x17
             }
         })
         Return(RBUF)

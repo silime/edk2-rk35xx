@@ -401,7 +401,8 @@ ConfigureWifiInterface (
   HAL_CRU_ClkEnable (HCLK_SDIO_NIU_GATE);
   HAL_CRU_ClkEnable (HCLK_SDIO_GATE);
   HAL_CRU_ClkEnable (CCLK_SRC_SDIO_GATE);
-  HAL_CRU_ClkSetFreq (CCLK_SRC_SDIO, 150000000);
+  // The rk3288-compatible DW-MMC clock generator divides CCLK_SRC_SDIO by 2.
+  HAL_CRU_ClkSetFreq (CCLK_SRC_SDIO, 300000000);
   HAL_CRU_RstDeassert (SRST_H_SDIO_NIU);
   HAL_CRU_RstDeassert (SRST_H_SDIO);
   HAL_CRU_RstDeassert (SRST_SDIO);
@@ -409,15 +410,15 @@ ConfigureWifiInterface (
   GpioPinSetFunction (2, GPIO_PIN_PB3, 2); // sdio_clk_m0
   GpioPinSetPull (2, GPIO_PIN_PB3, GPIO_PIN_PULL_NONE);
   GpioPinSetFunction (2, GPIO_PIN_PB2, 2); // sdio_cmd_m0
-  GpioPinSetPull (2, GPIO_PIN_PB2, GPIO_PIN_PULL_NONE);
+  GpioPinSetPull (2, GPIO_PIN_PB2, GPIO_PIN_PULL_UP);
   GpioPinSetFunction (2, GPIO_PIN_PA6, 2); // sdio_d0_m0
-  GpioPinSetPull (2, GPIO_PIN_PA6, GPIO_PIN_PULL_NONE);
+  GpioPinSetPull (2, GPIO_PIN_PA6, GPIO_PIN_PULL_UP);
   GpioPinSetFunction (2, GPIO_PIN_PA7, 2); // sdio_d1_m0
-  GpioPinSetPull (2, GPIO_PIN_PA7, GPIO_PIN_PULL_NONE);
+  GpioPinSetPull (2, GPIO_PIN_PA7, GPIO_PIN_PULL_UP);
   GpioPinSetFunction (2, GPIO_PIN_PB0, 2); // sdio_d2_m0
-  GpioPinSetPull (2, GPIO_PIN_PB0, GPIO_PIN_PULL_NONE);
+  GpioPinSetPull (2, GPIO_PIN_PB0, GPIO_PIN_PULL_UP);
   GpioPinSetFunction (2, GPIO_PIN_PB1, 2); // sdio_d3_m0
-  GpioPinSetPull (2, GPIO_PIN_PB1, GPIO_PIN_PULL_NONE);
+  GpioPinSetPull (2, GPIO_PIN_PB1, GPIO_PIN_PULL_UP);
 
   GpioPinSetFunction (0, GPIO_PIN_PB7, 0);
   GpioPinSetPull (0, GPIO_PIN_PB7, GPIO_PIN_PULL_DOWN);
@@ -552,11 +553,7 @@ PlatformEarlyInit(
   GpioPinWrite (1, GPIO_PIN_PD3, TRUE);
   MicroSecondDelay (200 * 1000);
 
-  /* lsm6ds3tr-c 
-    interrupt-parent = <&gpio4>;
-		interrupts = <RK_PC2 IRQ_TYPE_LEVEL_HIGH>;
-    rockchip,pins = <4 RK_PC2 RK_FUNC_GPIO &pcfg_pull_none>;
-  */
+  /* lsm6ds3tr-c */
   GpioPinSetFunction (4, GPIO_PIN_PC2, 0);
   GpioPinSetPull (4, GPIO_PIN_PC2, GPIO_PIN_PULL_NONE);
   GpioPinSetDirection (4, GPIO_PIN_PC2, GPIO_PIN_INPUT);
